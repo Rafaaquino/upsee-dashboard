@@ -1,0 +1,37 @@
+:root {
+    --primary-color: #ea580c;
+    --primary-rgb: hexToRGB(#ea580c);
+    --light: #f8fbff;
+    --light-rgb: hexToRGB(#f8fbff);
+    --theme-secondary: #f3682d;
+    --heading-primary: #010915;
+    --heading-secondary: rgba(1, 9, 21, 0.7);
+    --text-body: #808589;
+    --text-p: #808589;
+    --menu-primary: rgba(1, 9, 21, 0.7);
+}
+
+.text-primary {
+    color: var(--primary-color) !important;
+}
+
+.btn-gradient {
+    background: linear-gradient(135deg, rgba(234, 88, 12, 1) 0%, rgba(243, 104, 45, 1) 100%);
+}
+
+.bg-primary {
+    background: linear-gradient(135deg, rgb(234 88 12 / 32%) 0%, rgb(243 104 45 / 28%) 100%);
+}
+
+h1 {
+    color: var(--primary-color);
+}
+
+.bg-white\/60 {
+    background-color: rgb(255 255 255 / 0.8);
+}
+
+.invalid-feedback {
+    padding: 10px;
+    color: red;
+}

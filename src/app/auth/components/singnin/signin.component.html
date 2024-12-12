@@ -1,0 +1,84 @@
+<div>
+    <div class="absolute inset-0 bg-primary"></div>
+
+    <div class="relative flex min-h-screen items-center justify-center px-6 py-10 dark:bg-[#060818] sm:px-16">
+        <div
+            class="relative w-full max-w-[870px] rounded-md bg-[linear-gradient(45deg,#fff9f9_0%,rgba(255,255,255,0)_25%,rgba(255,255,255,0)_75%,_#fff9f9_100%)] p-2 dark:bg-[linear-gradient(52.22deg,#0E1726_0%,rgba(14,23,38,0)_18.66%,rgba(14,23,38,0)_51.04%,rgba(14,23,38,0)_80.07%,#0E1726_100%)]"
+        >
+            <div class="relative flex flex-col justify-center rounded-md bg-white/60 px-6 py-20 backdrop-blur-lg dark:bg-black/50 lg:min-h-[758px]">
+                <div class="mx-auto w-full max-w-[440px]">
+                    <div class="mb-10">
+                        <h1 class="text-3xl font-extrabold uppercase !leading-snug text-primary md:text-4xl">LOGIN</h1>
+                        <p class="text-base font-bold leading-normal text-white-dark">Digite seu e-mail e senha para fazer login</p>
+                    </div>
+                    <form class="space-y-5 dark:text-white" [formGroup]="loginForm" (ngSubmit)="submit()">
+                        <div>
+                            <label for="Email">Email</label>
+                            <div class="relative text-white-dark">
+                                <input
+                                    id="Email"
+                                    type="email"
+                                    formControlName="email"
+                                    placeholder="Email"
+                                    class="form-input ps-10 placeholder:text-white-dark"
+                                    required
+                                />
+                                <span class="absolute start-4 top-1/2 -translate-y-1/2">
+                                    <icon-mail [fill]="true" />
+                                </span>
+                            </div>
+                            <div
+                                class="invalid-feedback"
+                                *ngIf="loginForm.get('email')?.invalid && (loginForm.get('email')?.dirty || loginForm.get('email')?.touched)"
+                            >
+                                <div *ngIf="f['email'].errors?.['required']">Email obrigatório</div>
+                                <div *ngIf="f['email'].errors?.['email']">Email inválido</div>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="Password">{{ 'Senha' | translate }}</label>
+                            <div class="relative text-white-dark">
+                                <input
+                                    id="Password"
+                                    type="password"
+                                    formControlName="password"
+                                    placeholder="Senha"
+                                    class="form-input ps-10 placeholder:text-white-dark"
+                                    required
+                                />
+                                <span class="absolute start-4 top-1/2 -translate-y-1/2">
+                                    <icon-lock-dots [fill]="true" />
+                                </span>
+                            </div>
+                            <div
+                                class="invalid-feedback"
+                                *ngIf="loginForm.get('password')?.invalid && (loginForm.get('password')?.dirty || loginForm.get('password')?.touched)"
+                            >
+                                <div *ngIf="f['password'].errors?.['required']">Senha obrigatória</div>
+                                <div *ngIf="f['password'].errors?.['password']">Senha inválido</div>
+                                <div *ngIf="f['password'].errors?.['customError']">{{ f['password'].errors?.['customError'] }}</div>
+                            </div>
+                        </div>
+                        <button
+                            type="submit"
+                            [disabled]="loginForm.invalid"
+                            class="btn btn-gradient !mt-6 w-full border-0 uppercase shadow-[0_10px_20px_-10px_rgba(67,97,238,0.44)]"
+                        >
+                            ENTRAR
+                        </button>
+                    </form>
+                    <div class="relative my-7 text-center md:mb-9">
+                        <span class="absolute inset-x-0 top-1/2 h-px w-full -translate-y-1/2 bg-white-light dark:bg-white-dark"></span>
+                        <span class="relative bg-white px-2 font-bold uppercase text-white-dark dark:bg-dark dark:text-white-light">or</span>
+                    </div>
+                    <div class="text-center dark:text-white">
+                        Esqueceu sua senha?
+                        <a routerLink="/auth/forgot-password" class="uppercase text-primary underline transition hover:text-black dark:hover:text-white">
+                            RECUPERAR SENHA
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
