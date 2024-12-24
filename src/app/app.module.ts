@@ -20,9 +20,9 @@ import { MenuModule } from 'headlessui-angular';
 import { ModalModule } from 'angular-custom-modal';
 import { SortablejsModule } from '@dustfoundation/ngx-sortablejs';
 import { QuillModule } from 'ngx-quill';
-import { IndexComponent } from './index';
+import { IndexComponent } from './pages/dashboard/index';
 import { AnalyticsComponent } from './analytics';
-import { FinanceComponent } from './finance';
+import { FinanceComponent } from './pages/dashboard/components/finance/finance';
 import { CryptoComponent } from './crypto';
 import { WidgetsComponent } from './widgets';
 import { TablesComponent } from './tables';
@@ -39,9 +39,9 @@ import { FooterComponent } from './shared/layouts/footer';
 import { SidebarComponent } from './shared/layouts/sidebar';
 import { ThemeCustomizerComponent } from './shared/layouts/theme-customizer';
 import { IconModule } from './shared/icon/icon.module';
-import { AuthModule } from './auth/auth.module';
-import { SigninComponent } from './auth/components/singnin/signin.component';
-import { AuthInterceptor } from './auth/interceptor/auth.interceptor';
+import { AuthModule } from './pages/auth/auth.module';
+import { SigninComponent } from './pages/auth/components/singnin/signin.component';
+import { AuthInterceptor } from './pages/auth/interceptor/auth.interceptor';
 
 @NgModule({
     imports: [

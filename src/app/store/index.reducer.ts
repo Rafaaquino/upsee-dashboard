@@ -7,7 +7,7 @@ export const initialState = {
     rtlClass: 'ltr',
     animation: '',
     navbar: 'navbar-sticky',
-    locale: 'en',
+    locale: 'pt',
     sidebar: false,
     languageList: [
         { code: 'zh', name: 'Chinese' },

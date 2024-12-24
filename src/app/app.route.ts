@@ -1,9 +1,9 @@
 import { Routes } from '@angular/router';
 
 // dashboard
-import { IndexComponent } from './index';
+import { IndexComponent } from './pages/dashboard/index';
 import { AnalyticsComponent } from './analytics';
-import { FinanceComponent } from './finance';
+import { FinanceComponent } from './pages/dashboard/components/finance/finance';
 import { CryptoComponent } from './crypto';
 
 import { WidgetsComponent } from './widgets';
@@ -75,7 +75,7 @@ export const routes: Routes = [
             { path: '', loadChildren: () => import('./pages/pages.module').then((d) => d.PagesModule) },
 
             // auth
-            { path: '', loadChildren: () => import('./auth/auth.module').then((d) => d.AuthModule) },
+            { path: '', loadChildren: () => import('./pages/auth/auth.module').then((d) => d.AuthModule) },
         ],
     },
     {

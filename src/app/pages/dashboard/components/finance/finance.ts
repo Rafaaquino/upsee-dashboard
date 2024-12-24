@@ -4,6 +4,7 @@ import { animate, style, transition, trigger } from '@angular/animations';
 
 @Component({
     moduleId: module.id,
+    selector: 'app-finance',
     templateUrl: './finance.html',
     animations: [
         trigger('toggleAnimation', [
@@ -22,31 +23,7 @@ export class FinanceComponent {
     solana: any;
     isLoading = true;
     constructor(public storeData: Store<any>) {
-        this.initStore();
         this.isLoading = false;
-    }
-
-    async initStore() {
-        this.storeData
-            .select((d) => d.index)
-            .subscribe((d) => {
-                const hasChangeTheme = this.store?.theme !== d?.theme;
-                const hasChangeLayout = this.store?.layout !== d?.layout;
-                const hasChangeMenu = this.store?.menu !== d?.menu;
-                const hasChangeSidebar = this.store?.sidebar !== d?.sidebar;
-
-                this.store = d;
-
-                if (hasChangeTheme || hasChangeLayout || hasChangeMenu || hasChangeSidebar) {
-                    if (this.isLoading || hasChangeTheme) {
-                        this.initCharts(); //init charts
-                    } else {
-                        setTimeout(() => {
-                            this.initCharts(); // refresh charts
-                        }, 300);
-                    }
-                }
-            });
     }
 
     initCharts() {

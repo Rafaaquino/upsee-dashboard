@@ -35,3 +35,11 @@ h1 {
     padding: 10px;
     color: red;
 }
+
+.om-h:hover {
+    cursor: pointer;
+}
+
+.fs-1 {
+    font-size: 1.2rem;
+}

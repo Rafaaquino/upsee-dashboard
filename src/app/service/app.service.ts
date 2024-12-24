@@ -35,9 +35,9 @@ export class AppService {
 
         const list = this.storeData.languageList;
         const item = list.find((item: any) => item.code === val);
-        if (item) {
-            this.toggleLanguage(item);
-        }
+        // if (item) {
+        //     this.toggleLanguage(item);
+        // }
 
         val = localStorage.getItem('rtlClass'); // rtl, ltr
         val = val || $themeConfig.rtlClass;

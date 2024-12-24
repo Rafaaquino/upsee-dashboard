@@ -1,6 +1,12 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { animate, style, transition, trigger } from '@angular/animations';
+import { DataService } from './service/data.service';
+import { FilterService } from './service/filter.service';
+import { IParamsData } from './models/params-data.interface';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { firstValueFrom } from 'rxjs';
+import { MockDataService } from './service/MockData.service';
 
 @Component({
     moduleId: module.id,
@@ -12,16 +18,58 @@ import { animate, style, transition, trigger } from '@angular/animations';
         ]),
     ],
 })
-export class IndexComponent {
+export class IndexComponent implements OnInit {
     store: any;
     revenueChart: any;
     salesByCategory: any;
     dailySales: any;
     totalOrders: any;
+    uniqueVisitor: any;
     isLoading = true;
-    constructor(public storeData: Store<any>) {
+    filterForm: FormGroup;
+    fetchData: any;
+    gender: any;
+    params: IParamsData = { cliente_id: '21122024', from: '21/12/24', to: '21/12/24' };
+
+    constructor(
+        public storeData: Store<any>,
+        private fb: FormBuilder,
+        private _dataService: DataService,
+        private _filterService: FilterService,
+        private _mockDataService: MockDataService
+    ) {
         this.initStore();
         this.isLoading = false;
+
+        this.filterForm = this.fb.group({
+            dateFilter: ['today'], // Options: 'today', 'month', 'year', 'range'
+            startDate: [null],
+            endDate: [null],
+        });
+
+        this.initializeData(); // Usamos uma função separada para garantir a inicialização síncrona
+    }
+
+    async ngOnInit() {
+        this.filterForm.valueChanges.subscribe(() => {
+            this.updateChart();
+        });
+    }
+
+    private async initializeData() {
+        this.fetchData = await this._mockDataService.generateMockData();
+
+        console.log('início', this.fetchData);
+        this.updateChart();
+    }
+
+    private async getFetchData(): Promise<any> {
+        try {
+            return await firstValueFrom(this._dataService.getData(this.params));
+        } catch (error) {
+            console.error('Erro ao buscar dados:', error);
+            return null;
+        }
     }
 
     async initStore() {
@@ -189,11 +237,107 @@ export class IndexComponent {
             series: [
                 {
                     name: 'Income',
-                    data: [16800, 16800, 15500, 17800, 15500, 17000, 19000, 16000, 15000, 17000, 14000, 17000],
+                    data: [168, 16800, 15500, 17800, 15500, 17000, 19000, 16000, 15000, 17000, 14000, 17000],
                 },
                 {
                     name: 'Expenses',
-                    data: [16500, 17500, 16200, 17300, 16000, 19500, 16000, 17000, 16000, 19000, 18000, 19000],
+                    data: [165, 17500, 16200, 17300, 16000, 19500, 16000, 17000, 16000, 19000, 18000, 19000],
+                },
+            ],
+        };
+
+        //
+        this.uniqueVisitor = {
+            chart: {
+                height: 360,
+                type: 'bar',
+                fontFamily: 'Nunito, sans-serif',
+                toolbar: {
+                    show: false,
+                },
+            },
+            dataLabels: {
+                enabled: false,
+            },
+            stroke: {
+                width: 2,
+                colors: ['transparent'],
+            },
+            colors: ['#5c1ac3', '#ffbb44'],
+            dropShadow: {
+                enabled: true,
+                blur: 3,
+                color: '#515365',
+                opacity: 0.4,
+            },
+            plotOptions: {
+                bar: {
+                    horizontal: false,
+                    columnWidth: '55%',
+                    borderRadius: 10,
+                    borderRadiusApplication: 'end',
+                },
+            },
+            legend: {
+                position: 'bottom',
+                horizontalAlign: 'center',
+                fontSize: '14px',
+                itemMargin: {
+                    horizontal: 8,
+                    vertical: 8,
+                },
+            },
+            grid: {
+                borderColor: isDark ? '#191e3a' : '#e0e6ed',
+                padding: {
+                    left: 20,
+                    right: 20,
+                },
+            },
+            xaxis: {
+                categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                axisBorder: {
+                    show: true,
+                    color: isDark ? '#3b3f5c' : '#e0e6ed',
+                },
+            },
+            yaxis: {
+                tickAmount: 6,
+                opposite: isRtl ? true : false,
+                labels: {
+                    offsetX: isRtl ? -10 : 0,
+                },
+            },
+            fill: {
+                type: 'gradient',
+                gradient: {
+                    shade: isDark ? 'dark' : 'light',
+                    type: 'vertical',
+                    shadeIntensity: 0.3,
+                    inverseColors: false,
+                    opacityFrom: 1,
+                    opacityTo: 0.8,
+                    stops: [0, 100],
+                },
+            },
+            tooltip: {
+                marker: {
+                    show: true,
+                },
+                y: {
+                    formatter: (val: any) => {
+                        return val;
+                    },
+                },
+            },
+            series: [
+                {
+                    name: 'Direct',
+                    data: [58, 44, 55, 57, 56, 61, 58, 63, 60, 66, 56, 63],
+                },
+                {
+                    name: 'Organic',
+                    data: [91, 76, 85, 101, 98, 87, 105, 91, 114, 94, 66, 70],
                 },
             ],
         };
@@ -408,6 +552,111 @@ export class IndexComponent {
                 {
                     name: 'Sales',
                     data: [28, 40, 36, 52, 38, 60, 38, 52, 36, 40],
+                },
+            ],
+        };
+    }
+
+    updateChart(): void {
+        debugger;
+        const filteredData = this._filterService.filterData(this.fetchData, this.filterForm.value);
+        const genderCountByMonth = this._filterService.countGenderByMonth(filteredData);
+        console.log('genderCountByMonth', genderCountByMonth);
+        const isDark = this.store.theme === 'dark' || this.store.isDarkMode ? true : false;
+        const isRtl = this.store.rtlClass === 'rtl' ? true : false;
+
+        this.uniqueVisitor = {
+            ...this.uniqueVisitor,
+            chart: {
+                height: 360,
+                type: 'bar',
+                fontFamily: 'Nunito, sans-serif',
+                toolbar: {
+                    show: false,
+                },
+            },
+            dataLabels: {
+                enabled: false,
+            },
+            stroke: {
+                width: 2,
+                colors: ['transparent'],
+            },
+            colors: ['#5c1ac3', '#ffbb44'],
+            dropShadow: {
+                enabled: true,
+                blur: 3,
+                color: '#515365',
+                opacity: 0.4,
+            },
+            plotOptions: {
+                bar: {
+                    horizontal: false,
+                    columnWidth: '55%',
+                    borderRadius: 10,
+                    borderRadiusApplication: 'end',
+                },
+            },
+            legend: {
+                position: 'bottom',
+                horizontalAlign: 'center',
+                fontSize: '14px',
+                itemMargin: {
+                    horizontal: 8,
+                    vertical: 8,
+                },
+            },
+            grid: {
+                borderColor: isDark ? '#191e3a' : '#e0e6ed',
+                padding: {
+                    left: 20,
+                    right: 20,
+                },
+            },
+            xaxis: {
+                categories: genderCountByMonth.map((monthData) => monthData.month),
+                axisBorder: {
+                    show: true,
+                    color: isDark ? '#3b3f5c' : '#e0e6ed',
+                },
+            },
+            yaxis: {
+                tickAmount: 6,
+                opposite: isRtl ? true : false,
+                labels: {
+                    offsetX: isRtl ? -10 : 0,
+                },
+            },
+            fill: {
+                type: 'gradient',
+                gradient: {
+                    shade: isDark ? 'dark' : 'light',
+                    type: 'vertical',
+                    shadeIntensity: 0.3,
+                    inverseColors: false,
+                    opacityFrom: 1,
+                    opacityTo: 0.8,
+                    stops: [0, 100],
+                },
+            },
+            tooltip: {
+                marker: {
+                    show: true,
+                },
+                y: {
+                    formatter: (val: any) => {
+                        return val;
+                    },
+                },
+            },
+            series: [
+                {
+                    name: 'Homem',
+                    data: genderCountByMonth.map((monthData) => monthData.male),
+                },
+                {
+                    name: 'Mulher',
+                    data: genderCountByMonth.map((monthData) => monthData.female),
                 },
             ],
         };

@@ -8,9 +8,9 @@ import { ForgotPasswordService } from '../../services/forgotPassword.service';
 
 @Component({
     moduleId: module.id,
-    selector: 'app-reset-password',
-    templateUrl: './reset-password.component.html',
-    styleUrls: ['./reset-password.component.css'],
+    selector: 'app-forgotPassword',
+    templateUrl: './forgotPassword.component.html',
+    styleUrls: ['./forgotPassword.component.css'],
     animations: [
         trigger('toggleAnimation', [
             transition(':enter', [style({ opacity: 0, transform: 'scale(0.95)' }), animate('100ms ease-out', style({ opacity: 1, transform: 'scale(1)' }))]),
@@ -18,9 +18,9 @@ import { ForgotPasswordService } from '../../services/forgotPassword.service';
         ]),
     ],
 })
-export class PasswordResetComponent implements OnInit {
+export class ForgotPasswordComponent implements OnInit {
     store: any;
-    resetPassForm: FormGroup;
+    forgotPassForm: FormGroup;
 
     constructor(
         public translate: TranslateService,
@@ -30,9 +30,8 @@ export class PasswordResetComponent implements OnInit {
         private fb: FormBuilder
     ) {
         this.initStore();
-        this.resetPassForm = this.fb.group({
-            newPassword: ['', [Validators.required, Validators.minLength(8)]],
-            mathPassword: ['', [Validators.required, Validators.minLength(8)]],
+        this.forgotPassForm = this.fb.group({
+            email: ['', [Validators.required, Validators.email]],
         });
     }
 
@@ -47,17 +46,12 @@ export class PasswordResetComponent implements OnInit {
     }
 
     get f() {
-        return this.resetPassForm.controls;
+        return this.forgotPassForm.controls;
     }
 
     submit() {
-        if (this.resetPassForm.invalid) {
-            return alert('Invalid Form');
-        }
-
-        if (this.resetPassForm.valid) {
-            const email = localStorage.getItem('email') as string;
-            this._forgotPassService.resetPassword(this.resetPassForm.value, email).subscribe({
+        if (this.forgotPassForm.valid) {
+            this._forgotPassService.forgotPassword(this.forgotPassForm.value).subscribe({
                 next: this.onSubmitSuccess.bind(this),
                 error: this.onSubmitError.bind(this),
             });
@@ -66,11 +60,12 @@ export class PasswordResetComponent implements OnInit {
 
     onSubmitSuccess(res: any) {
         console.log(res);
-        localStorage.removeItem('email');
-        this.router.navigateByUrl('/');
+        localStorage.setItem('email', res.email);
+        this.router.navigateByUrl('auth/code-authenticate');
     }
 
     onSubmitError(error: any) {
-        console.log(error);
+        console.log(error.error.message);
+        this.f['email'].setErrors({ customError: error.error.message });
     }
 }

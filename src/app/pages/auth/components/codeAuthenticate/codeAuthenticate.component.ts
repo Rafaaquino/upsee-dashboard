@@ -1,17 +1,16 @@
 import { animate, style, transition, trigger } from '@angular/animations';
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
-import { AppService } from 'src/app/service/app.service';
 import { ForgotPasswordService } from '../../services/forgotPassword.service';
 
 @Component({
     moduleId: module.id,
-    selector: 'app-forgotPassword',
-    templateUrl: './forgotPassword.component.html',
-    styleUrls: ['./forgotPassword.component.css'],
+    selector: 'app-codeAuthenticate',
+    templateUrl: './codeAuthenticate.component.html',
+    styleUrls: ['./codeAuthenticate.component.css'],
     animations: [
         trigger('toggleAnimation', [
             transition(':enter', [style({ opacity: 0, transform: 'scale(0.95)' }), animate('100ms ease-out', style({ opacity: 1, transform: 'scale(1)' }))]),
@@ -19,24 +18,22 @@ import { ForgotPasswordService } from '../../services/forgotPassword.service';
         ]),
     ],
 })
-export class ForgotPasswordComponent implements OnInit {
+export class CodeAuthenticateComponent {
     store: any;
-    forgotPassForm: FormGroup;
+    codeAuthForm: FormGroup;
 
     constructor(
         public translate: TranslateService,
         public storeData: Store<any>,
         public router: Router,
-        private _forgotPassService: ForgotPasswordService,
-        private fb: FormBuilder
+        private fb: FormBuilder,
+        private _forgotPassService: ForgotPasswordService
     ) {
         this.initStore();
-        this.forgotPassForm = this.fb.group({
-            email: ['', [Validators.required, Validators.email]],
+        this.codeAuthForm = this.fb.group({
+            code: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(6)]],
         });
     }
-
-    ngOnInit(): void {}
 
     async initStore() {
         this.storeData
@@ -46,27 +43,31 @@ export class ForgotPasswordComponent implements OnInit {
             });
     }
 
+    ngOnInit(): void {}
+
     get f() {
-        return this.forgotPassForm.controls;
+        return this.codeAuthForm.controls;
     }
 
     submit() {
-        if (this.forgotPassForm.valid) {
-            this._forgotPassService.forgotPassword(this.forgotPassForm.value).subscribe({
+        if (this.codeAuthForm.valid) {
+            const email = localStorage.getItem('email') as string;
+            const code = this.codeAuthForm.get('code')?.value;
+            this._forgotPassService.codeAuthPass(code, email).subscribe({
                 next: this.onSubmitSuccess.bind(this),
                 error: this.onSubmitError.bind(this),
             });
         }
     }
 
-    onSubmitSuccess(res: any) {
-        console.log(res);
-        localStorage.setItem('email', res.email);
-        this.router.navigateByUrl('auth/code-authenticate');
+    onSubmitSuccess(response: any) {
+        console.log(response);
+        localStorage.setItem('token', response.token);
+        localStorage.setItem('userId', response.userId);
+        this.router.navigateByUrl('auth/reset-password');
     }
 
     onSubmitError(error: any) {
-        console.log(error.error.message);
-        this.f['email'].setErrors({ customError: error.error.message });
+        console.log(error);
     }
 }

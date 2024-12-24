@@ -22,6 +22,7 @@ import { ILoginResponse } from '../../models/login-response.interface';
 })
 export class SigninComponent implements OnInit {
     store: any;
+    isPasswordVisible = false;
     loginForm: FormGroup;
 
     constructor(
@@ -66,6 +67,10 @@ export class SigninComponent implements OnInit {
         console.log(error.error.message);
         this.f['password'].setErrors({ customError: erro });
         //this.show(erro);
+    }
+
+    togglePasswordVisibility(): void {
+        this.isPasswordVisible = !this.isPasswordVisible;
     }
 
     async initStore() {

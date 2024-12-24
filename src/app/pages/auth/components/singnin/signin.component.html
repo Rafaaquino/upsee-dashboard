@@ -40,14 +40,14 @@
                             <div class="relative text-white-dark">
                                 <input
                                     id="Password"
-                                    type="password"
+                                    [type]="isPasswordVisible ? 'text' : 'password'"
                                     formControlName="password"
                                     placeholder="Senha"
                                     class="form-input ps-10 placeholder:text-white-dark"
                                     required
                                 />
-                                <span class="absolute start-4 top-1/2 -translate-y-1/2">
-                                    <icon-lock-dots [fill]="true" />
+                                <span (click)="togglePasswordVisibility()" class="om-h absolute start-4 top-1/2 -translate-y-1/2">
+                                    <i [class]="isPasswordVisible ? 'fa fa-solid fa-unlock fs-1' : 'fa fa-solid fa-lock fs-1'"></i>
                                 </span>
                             </div>
                             <div
