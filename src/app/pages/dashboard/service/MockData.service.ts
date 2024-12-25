@@ -6,16 +6,16 @@ import { Injectable } from '@angular/core';
 export class MockDataService {
     generateMockData(): any[] {
         const baseData = {
-            stop_detection_time: '21/12/24 15:43:31',
+            stop_detection_time: '24/12/24 15:43:31',
             score: 0.61,
-            detected_time: '21/12/24 15:42:05',
+            detected_time: '24/12/24 15:42:05',
             tracker_id: 1,
             gender: '',
             idTrack: 2580,
             bbox: '(10.875, 1.625, 518.0, 258.0)',
             class_name: 'pessoa',
             client_id: 21122024,
-            gender_score: 0,
+            gender_score: 0.72,
         };
 
         const mockData = [];
@@ -28,7 +28,7 @@ export class MockDataService {
             const second = String(Math.floor(Math.random() * 60)).padStart(2, '0'); // Segundo entre 00 e 59
 
             // O formato de data final será 'DD/MM/YY HH:mm:ss'
-            return `21/${String(month + 1).padStart(2, '0')}/24 ${hour}:${minute}:${second}`;
+            return `25/${String(month + 1).padStart(2, '0')}/24 ${hour}:${minute}:${second}`;
         };
 
         for (let month = 0; month < 12; month++) {
@@ -44,6 +44,7 @@ export class MockDataService {
                     idTrack: baseData.idTrack + mockData.length + 1,
                     detected_time: generateDate(month), // Chama a função para gerar a data
                     stop_detection_time: generateDate(month), // Chama a função para gerar a data
+                    gender_score: parseFloat((0.61 + Math.random() * (0.99 - 0.61)).toFixed(2)),
                 });
             }
 
@@ -55,6 +56,7 @@ export class MockDataService {
                     idTrack: baseData.idTrack + mockData.length + 1,
                     detected_time: generateDate(month), // Chama a função para gerar a data
                     stop_detection_time: generateDate(month), // Chama a função para gerar a data
+                    gender_score: parseFloat((0.61 + Math.random() * (0.99 - 0.61)).toFixed(2)), // Gera score aleatório entre 0.61 e 0.99
                 });
             }
         }
