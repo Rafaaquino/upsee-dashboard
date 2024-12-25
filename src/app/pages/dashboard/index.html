@@ -9,6 +9,72 @@
     </ul>
 
     <div class="pt-5">
+        <div class="mb-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div class="panel h-full">
+                <div class="mb-5 flex items-center justify-between dark:text-white-light">
+                    <h5 class="text-lg font-semibold">Tempo médio de permanência:</h5>
+                </div>
+                <div class="my-10 text-5xl font-bold text-[#e95f2b]">
+                    <span class="ltr:mr-2 rtl:ml-2">{{ averageStayTime }}</span>
+                </div>
+            </div>
+
+            <div class="panel h-full sm:col-span-2 lg:col-span-1">
+                <!-- statistics -->
+                <div class="mb-5 flex items-center justify-between dark:text-white-light">
+                    <h5 class="text-lg font-semibold">Tempo médio por pessoa:</h5>
+                </div>
+                <div class="grid gap-8 text-sm font-bold text-[#515365] sm:grid-cols-2">
+                    <div>
+                        <div>
+                            <div>Total Homem</div>
+                            <div class="text-3xl text-[#e95f2b]">{{ genderFormatTime.male}}</div>
+                        </div>
+                        <div class="overflow-hidden"></div>
+                    </div>
+
+                    <div>
+                        <div>
+                            <div>Total Mulher</div>
+                            <div class="text-3xl text-[#e95f2b]">{{ genderFormatTime.female}}</div>
+                        </div>
+                        <div class="overflow-hidden"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel overflow-hidden">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div class="text-lg font-bold">Frequência por Faixa Horária:</div>
+                        <div class="text-success">Quantidade de pessoal frequentando entre os horários:</div>
+                    </div>
+                </div>
+                <div class="relative mt-10">
+                    <div class="absolute -bottom-12 h-24 w-24 ltr:-right-12 rtl:-left-12">
+                        <icon-circle-check class="h-full w-full text-success opacity-20" />
+                    </div>
+                    <div class="grid grid-cols-2 gap-6 md:grid-cols-3">
+                        <div>
+                            <div class="text-primary">06:00 - 11:59</div>
+                            <div class="mt-2 text-2xl font-semibold">{{frequencyByTimeRange.morning}}</div>
+                        </div>
+                        <div>
+                            <div class="text-primary">12:00 - 17:59</div>
+                            <div class="mt-2 text-2xl font-semibold">{{frequencyByTimeRange.afternoon}}</div>
+                        </div>
+                        <div>
+                            <div class="text-primary">18:00 - 23:59</div>
+                            <div class="mt-2 text-2xl font-semibold">{{frequencyByTimeRange.evening}}</div>
+                        </div>
+                        <!-- <div>
+                            <div class="text-primary">00:00 - 05:59</div>
+                            <div class="mt-2 text-2xl font-semibold">{{frequencyByTimeRange.night}}</div>
+                        </div> -->
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="mb-6 grid gap-6 xl:grid-cols-3">
             <div class="panel h-full xl:col-span-2">
                 <div class="mb-5 flex items-center justify-between dark:text-white-light">
@@ -19,7 +85,7 @@
                                 <div class="filter-group">
                                     <label for="dateFilter">Filter by:</label>
                                     <select id="dateFilter" formControlName="dateFilter">
-                                        <option value="day">Today</option>
+                                        <option value="today">Today</option>
                                         <option value="month">This Month</option>
                                         <option value="year">This Year</option>
                                         <option value="range">Custom Range</option>
@@ -34,7 +100,8 @@
                                     <input id="endDate" type="date" formControlName="endDate" />
                                 </div>
                             </form>
-                            <!-- <a hlMenuButton href="javascript:;" class="align-middle">
+
+                            <a hlMenuButton href="javascript:;" class="align-middle">
                                 <icon-horizontal-dots class="text-black/70 hover:!text-primary dark:text-white/70" />
                             </a>
                             <ul *hlMenuItems @toggleAnimation class="ltr:right-0 rtl:left-0">
@@ -47,11 +114,11 @@
                                 <li>
                                     <a href="javascript:;" *hlMenuItem="let menuItem">Yearly</a>
                                 </li>
-                            </ul> -->
+                            </ul>
                         </div>
                     </div>
                 </div>
-                <p class="text-lg dark:text-white-light/90">Taxa de acerto<span class="ml-2 text-primary">73%</span></p>
+                <p class="text-lg dark:text-white-light/90">Taxa de acerto<span class="ml-2 text-primary">{{ genderScore?.toFixed(1)}}%</span></p>
                 <div class="relative overflow-hidden">
                     <!-- [dropShadow]="revenueChart.dropShadow" -->
                     <apx-chart
@@ -104,7 +171,18 @@
         </div>
 
         <div class="mb-6 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-            <div class="panel h-full sm:col-span-2 xl:col-span-1">
+            <div class="panel h-full sm:col-span-2 lg:col-span-1">
+                <div class="grid gap-8 text-sm font-bold text-[#515365] sm:grid-cols-2">
+                    <div>
+                        <div>
+                            <div>Total Visits</div>
+                            <div class="text-lg text-[#f8538d]">{{ averageStayTime }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- <div class="panel h-full sm:col-span-2 xl:col-span-1">
                 <div class="mb-5 flex items-center">
                     <h5 class="text-lg font-semibold dark:text-white-light">
                         Daily Sales <span class="block text-sm font-normal text-white-dark">Go to columns for details.</span>
@@ -131,13 +209,13 @@
                         [grid]="dailySales.grid"
                         class="rounded-lg bg-white dark:bg-black"
                     >
-                        <!-- loader -->
+                         loader
                         <div class="grid min-h-[175px] place-content-center bg-white-light/30 dark:bg-dark dark:bg-opacity-[0.08]">
                             <span class="inline-flex h-5 w-5 animate-spin rounded-full border-2 border-black !border-l-transparent dark:border-white"></span>
                         </div>
                     </apx-chart>
                 </div>
-            </div>
+            </div> -->
 
             <div class="panel h-full">
                 <div class="mb-5 flex items-center dark:text-white-light">
