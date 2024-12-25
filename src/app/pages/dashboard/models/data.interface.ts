@@ -19,3 +19,15 @@ export interface IGender {
     male: number;
     female: number;
 }
+
+export interface IGenderFormatTime {
+    male: string;
+    female: string;
+}
+
+export interface IFrequencyByTimeRange {
+    morning: number;
+    afternoon: number;
+    evening: number;
+    night: number;
+}
