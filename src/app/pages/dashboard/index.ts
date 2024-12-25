@@ -7,6 +7,7 @@ import { IParamsData } from './models/params-data.interface';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { firstValueFrom } from 'rxjs';
 import { MockDataService } from './service/MockData.service';
+import { IFrequencyByTimeRange, IGender, IGenderFormatTime } from './models/data.interface';
 
 @Component({
     moduleId: module.id,
@@ -28,7 +29,11 @@ export class IndexComponent implements OnInit {
     isLoading = true;
     filterForm: FormGroup;
     fetchData: any;
+    averageStayTime: any;
     gender: any;
+    genderScore: any;
+    genderFormatTime: IGenderFormatTime = { male: '00:00:00', female: '00:00:00' };
+    frequencyByTimeRange: IFrequencyByTimeRange = { morning: 0, afternoon: 0, evening: 0, night: 0 };
     params: IParamsData = { cliente_id: '21122024', from: '21/12/24', to: '21/12/24' };
 
     constructor(
@@ -388,6 +393,7 @@ export class IndexComponent implements OnInit {
                                 color: isDark ? '#bfc9d4' : undefined,
                                 offsetY: 16,
                                 formatter: (val: any) => {
+                                    console.log('val', val);
                                     return val;
                                 },
                             },
@@ -398,6 +404,7 @@ export class IndexComponent implements OnInit {
                                 fontSize: '29px',
                                 formatter: (w: any) => {
                                     return w.globals.seriesTotals.reduce(function (a: any, b: any) {
+                                        console.log('a', a + b), console.log('b', b);
                                         return a + b;
                                     }, 0);
                                 },
@@ -406,7 +413,7 @@ export class IndexComponent implements OnInit {
                     },
                 },
             },
-            labels: ['Apparel', 'Sports', 'Others'],
+            labels: ['Homem', 'Mulher'],
             states: {
                 hover: {
                     filter: {
@@ -425,83 +432,83 @@ export class IndexComponent implements OnInit {
         };
 
         // daily sales
-        this.dailySales = {
-            chart: {
-                height: 160,
-                type: 'bar',
-                fontFamily: 'Nunito, sans-serif',
-                toolbar: {
-                    show: false,
-                },
-                stacked: true,
-                stackType: '100%',
-            },
-            dataLabels: {
-                enabled: false,
-            },
-            stroke: {
-                show: true,
-                width: 1,
-            },
-            colors: ['#e2a03f', '#e0e6ed'],
-            responsive: [
-                {
-                    breakpoint: 480,
-                    options: {
-                        legend: {
-                            position: 'bottom',
-                            offsetX: -10,
-                            offsetY: 0,
-                        },
-                    },
-                },
-            ],
-            xaxis: {
-                labels: {
-                    show: false,
-                },
-                categories: ['Sun', 'Mon', 'Tue', 'Wed', 'Thur', 'Fri', 'Sat'],
-            },
-            yaxis: {
-                show: false,
-            },
-            fill: {
-                opacity: 1,
-            },
-            plotOptions: {
-                bar: {
-                    horizontal: false,
-                    columnWidth: '25%',
-                },
-            },
-            legend: {
-                show: false,
-            },
-            grid: {
-                show: false,
-                xaxis: {
-                    lines: {
-                        show: false,
-                    },
-                },
-                padding: {
-                    top: 10,
-                    right: -20,
-                    bottom: -20,
-                    left: -20,
-                },
-            },
-            series: [
-                {
-                    name: 'Sales',
-                    data: [44, 55, 41, 67, 22, 43, 21],
-                },
-                {
-                    name: 'Last Week',
-                    data: [13, 23, 20, 8, 13, 27, 33],
-                },
-            ],
-        };
+        // this.dailySales = {
+        //     chart: {
+        //         height: 160,
+        //         type: 'bar',
+        //         fontFamily: 'Nunito, sans-serif',
+        //         toolbar: {
+        //             show: false,
+        //         },
+        //         stacked: true,
+        //         stackType: '100%',
+        //     },
+        //     dataLabels: {
+        //         enabled: false,
+        //     },
+        //     stroke: {
+        //         show: true,
+        //         width: 1,
+        //     },
+        //     colors: ['#e2a03f', '#e0e6ed'],
+        //     responsive: [
+        //         {
+        //             breakpoint: 480,
+        //             options: {
+        //                 legend: {
+        //                     position: 'bottom',
+        //                     offsetX: -10,
+        //                     offsetY: 0,
+        //                 },
+        //             },
+        //         },
+        //     ],
+        //     xaxis: {
+        //         labels: {
+        //             show: false,
+        //         },
+        //         categories: ['Sun', 'Mon', 'Tue', 'Wed', 'Thur', 'Fri', 'Sat'],
+        //     },
+        //     yaxis: {
+        //         show: false,
+        //     },
+        //     fill: {
+        //         opacity: 1,
+        //     },
+        //     plotOptions: {
+        //         bar: {
+        //             horizontal: false,
+        //             columnWidth: '25%',
+        //         },
+        //     },
+        //     legend: {
+        //         show: false,
+        //     },
+        //     grid: {
+        //         show: false,
+        //         xaxis: {
+        //             lines: {
+        //                 show: false,
+        //             },
+        //         },
+        //         padding: {
+        //             top: 10,
+        //             right: -20,
+        //             bottom: -20,
+        //             left: -20,
+        //         },
+        //     },
+        //     series: [
+        //         {
+        //             name: 'Sales',
+        //             data: [44, 55, 41, 67, 22, 43, 21],
+        //         },
+        //         {
+        //             name: 'Last Week',
+        //             data: [13, 23, 20, 8, 13, 27, 33],
+        //         },
+        //     ],
+        // };
 
         // total orders
         this.totalOrders = {
@@ -558,95 +565,29 @@ export class IndexComponent implements OnInit {
     }
 
     updateChart(): void {
-        debugger;
         const filteredData = this._filterService.filterData(this.fetchData, this.filterForm.value);
         const genderCountByMonth = this._filterService.countGenderByMonth(filteredData);
         console.log('genderCountByMonth', genderCountByMonth);
+        this.genderScore = this._filterService.calculateGenderScoreAverage(filteredData);
+        console.log('genderScore', this.genderScore);
         const isDark = this.store.theme === 'dark' || this.store.isDarkMode ? true : false;
         const isRtl = this.store.rtlClass === 'rtl' ? true : false;
+        this.averageStayTime = this._filterService.calculateAverageStayTime(filteredData);
+        console.log(`Média de Permanência: ${this.averageStayTime}`);
+
+        this.genderFormatTime = this._filterService.calculateAverageStayTimeByGender(filteredData);
+        console.log(`Média de Permanência por genero: ${this.genderFormatTime.female} - ${this.genderFormatTime.male}`);
+
+        this.frequencyByTimeRange = this._filterService.calculateFrequencyByTimeRange(filteredData);
+        console.log('Frequência por Faixa Horária:', this.frequencyByTimeRange);
 
         this.uniqueVisitor = {
             ...this.uniqueVisitor,
-            chart: {
-                height: 360,
-                type: 'bar',
-                fontFamily: 'Nunito, sans-serif',
-                toolbar: {
-                    show: false,
-                },
-            },
-            dataLabels: {
-                enabled: false,
-            },
-            stroke: {
-                width: 2,
-                colors: ['transparent'],
-            },
-            colors: ['#5c1ac3', '#ffbb44'],
-            dropShadow: {
-                enabled: true,
-                blur: 3,
-                color: '#515365',
-                opacity: 0.4,
-            },
-            plotOptions: {
-                bar: {
-                    horizontal: false,
-                    columnWidth: '55%',
-                    borderRadius: 10,
-                    borderRadiusApplication: 'end',
-                },
-            },
-            legend: {
-                position: 'bottom',
-                horizontalAlign: 'center',
-                fontSize: '14px',
-                itemMargin: {
-                    horizontal: 8,
-                    vertical: 8,
-                },
-            },
-            grid: {
-                borderColor: isDark ? '#191e3a' : '#e0e6ed',
-                padding: {
-                    left: 20,
-                    right: 20,
-                },
-            },
             xaxis: {
                 categories: genderCountByMonth.map((monthData) => monthData.month),
                 axisBorder: {
                     show: true,
                     color: isDark ? '#3b3f5c' : '#e0e6ed',
-                },
-            },
-            yaxis: {
-                tickAmount: 6,
-                opposite: isRtl ? true : false,
-                labels: {
-                    offsetX: isRtl ? -10 : 0,
-                },
-            },
-            fill: {
-                type: 'gradient',
-                gradient: {
-                    shade: isDark ? 'dark' : 'light',
-                    type: 'vertical',
-                    shadeIntensity: 0.3,
-                    inverseColors: false,
-                    opacityFrom: 1,
-                    opacityTo: 0.8,
-                    stops: [0, 100],
-                },
-            },
-            tooltip: {
-                marker: {
-                    show: true,
-                },
-                y: {
-                    formatter: (val: any) => {
-                        return val;
-                    },
                 },
             },
             series: [
@@ -660,5 +601,20 @@ export class IndexComponent implements OnInit {
                 },
             ],
         };
+
+        this.salesByCategory = {
+            ...this.salesByCategory,
+            series: this._filterService.filterGenderCounts(filteredData).series,
+        };
+
+        // this.totalOrders = {
+        //     ...this.totalOrders,
+        //     series: [
+        //         {
+        //             name: this._filterService.calculateAverageStayTime(filteredData),
+        //             data: [28, 40, 36, 52, 38, 60, 38, 52, 36, 40],
+        //         },
+        //     ],
+        // };
     }
 }
