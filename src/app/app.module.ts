@@ -42,6 +42,7 @@ import { IconModule } from './shared/icon/icon.module';
 import { AuthModule } from './pages/auth/auth.module';
 import { SigninComponent } from './pages/auth/components/singnin/signin.component';
 import { AuthInterceptor } from './pages/auth/interceptor/auth.interceptor';
+import { Ng2FlatpickrModule } from 'ng2-flatpickr';
 
 @NgModule({
     imports: [
@@ -71,6 +72,7 @@ import { AuthInterceptor } from './pages/auth/interceptor/auth.interceptor';
         HighlightModule,
         SortablejsModule,
         ModalModule,
+        Ng2FlatpickrModule,
         QuillModule.forRoot(),
         IconModule,
     ],
