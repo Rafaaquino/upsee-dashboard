@@ -28,7 +28,7 @@ export class MockDataService {
             const second = String(Math.floor(Math.random() * 60)).padStart(2, '0'); // Segundo entre 00 e 59
 
             // O formato de data final será 'DD/MM/YY HH:mm:ss'
-            return `25/${String(month + 1).padStart(2, '0')}/24 ${hour}:${minute}:${second}`;
+            return `30/${String(month + 1).padStart(2, '0')}/24 ${hour}:${minute}:${second}`;
         };
 
         for (let month = 0; month < 12; month++) {
@@ -40,6 +40,7 @@ export class MockDataService {
             for (let i = 0; i < maleCount; i++) {
                 mockData.push({
                     ...baseData,
+                    score: parseFloat((0.79 + Math.random() * (0.99 - 0.79)).toFixed(2)), // Gera score aleatório entre 0.79 e 0.99
                     gender: 'masculino',
                     idTrack: baseData.idTrack + mockData.length + 1,
                     detected_time: generateDate(month), // Chama a função para gerar a data
@@ -52,6 +53,7 @@ export class MockDataService {
             for (let i = 0; i < femaleCount; i++) {
                 mockData.push({
                     ...baseData,
+                    score: parseFloat((0.79 + Math.random() * (0.99 - 0.79)).toFixed(2)), // Gera score aleatório entre 0.79 e 0.99
                     gender: 'feminino',
                     idTrack: baseData.idTrack + mockData.length + 1,
                     detected_time: generateDate(month), // Chama a função para gerar a data
