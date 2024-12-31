@@ -1,11 +1,21 @@
 import { Injectable } from '@angular/core';
-import { IData, IGender, IGenderData } from '../models/data.interface';
+import {
+    IData,
+    IfrequecyByWeek,
+    IFrequencyByTimeRange,
+    IGender,
+    IGenderData,
+    IGenderFormatTime,
+    IGenderProportionByPeriod,
+    IPeopleOverTime,
+} from '../models/data.interface';
 import dayjs, { Dayjs } from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
 
 // Registrar o plugin
 dayjs.extend(isBetween);
 import customParseFormat from 'dayjs/plugin/customParseFormat';
+import { co } from '@fullcalendar/core/internal-common';
 
 dayjs.extend(customParseFormat);
 
@@ -33,7 +43,7 @@ export class FilterService {
         console.log('Gender Data:', this.genderData);
     }
 
-    filterData(data: any[], dataFilter: any): any[] {
+    filterData(data: IData[], dataFilter: any): any[] {
         const { dateFilter, startDate, endDate } = dataFilter;
 
         // Determine a base de comparação dependendo do filtro
@@ -82,7 +92,29 @@ export class FilterService {
         });
     }
 
-    countGenderByMonth(data: any[]): Array<{ month: string; male: number; female: number }> {
+    filterGenderCounts(data: IData[]): { series: number[] } {
+        const counts = {
+            total: 0,
+            male: 0,
+            female: 0,
+        };
+
+        data.forEach((item) => {
+            if (item.gender === 'masculino') {
+                counts.male += 1;
+            } else if (item.gender === 'feminino') {
+                counts.female += 1;
+            }
+        });
+
+        counts.total = counts.male + counts.female;
+
+        return {
+            series: [counts.male, counts.female],
+        };
+    }
+
+    countGenderByMonth(data: IData[]): Array<{ month: string; male: number; female: number }> {
         const months = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
 
         const genderCount: { [key: string]: { male: number; female: number } } = {};
@@ -109,40 +141,24 @@ export class FilterService {
         }));
     }
 
-    calculateGenderScoreAverage(data: any[]): number {
-        const scores = data.filter((item) => typeof item.gender_score === 'number').map((item) => item.gender_score);
+    calculateGenderScoreAverage(data: IData[]): any {
+        let genderScores = data.filter((item) => typeof item.gender_score === 'number').map((item) => item.gender_score);
+        const personScore = data.filter((item) => typeof item.score === 'number').map((item) => item.score);
 
-        if (scores.length === 0) return 0;
+        if (genderScores.length === 0) return (genderScores = [0]);
 
-        const totalScore = scores.reduce((sum, score) => sum + score, 0);
-        const average = totalScore / scores.length;
+        const totalScoreGender = genderScores.reduce((sum, score) => sum + score, 0);
+        const average = totalScoreGender / genderScores.length;
 
-        return average * 100;
+        const totalScorePerson = personScore.reduce((sum, score) => sum + score, 0);
+        const averageScore = totalScorePerson / personScore.length;
+
+        const scoreComplet = { genderScore: average * 100, personScore: averageScore * 100 };
+
+        return scoreComplet;
     }
 
-    filterGenderCounts(data: any[]): { series: number[] } {
-        const counts = {
-            total: 0,
-            male: 0,
-            female: 0,
-        };
-
-        data.forEach((item) => {
-            if (item.gender === 'masculino') {
-                counts.male += 1;
-            } else if (item.gender === 'feminino') {
-                counts.female += 1;
-            }
-        });
-
-        counts.total = counts.male + counts.female;
-
-        return {
-            series: [counts.male, counts.female],
-        };
-    }
-
-    calculateAverageStayTime(data: any[]): string {
+    calculateAverageStayTime(data: IData[]): string {
         let totalSeconds = 0;
         let validEntries = 0;
 
@@ -163,13 +179,13 @@ export class FilterService {
         return this.formatTime(totalSeconds, validEntries);
     }
 
-    calculateAverageStayTimeByGender(data: any[]): { male: string; female: string } {
+    calculateAverageStayTimeByGender(data: IData[]): IGenderFormatTime {
         const genderStats = {
             male: { totalSeconds: 0, count: 0 },
             female: { totalSeconds: 0, count: 0 },
         };
 
-        data.forEach((item) => {
+        data.forEach((item: any) => {
             const detectedTime = dayjs(item.detected_time, 'DD/MM/YY HH:mm:ss', true);
             const stopTime = dayjs(item.stop_detection_time, 'DD/MM/YY HH:mm:ss', true);
 
@@ -193,7 +209,7 @@ export class FilterService {
         };
     }
 
-    calculateFrequencyByTimeRange(data: any[]): { morning: number; afternoon: number; evening: number; night: number } {
+    calculateFrequencyByTimeRange(data: IData[]): IFrequencyByTimeRange {
         const timeRanges = {
             morning: { start: 6, end: 12, count: 0 }, // 06:00 - 11:59
             afternoon: { start: 12, end: 18, count: 0 }, // 12:00 - 17:59
@@ -224,6 +240,85 @@ export class FilterService {
             afternoon: timeRanges.afternoon.count,
             evening: timeRanges.evening.count,
             night: timeRanges.night.count,
+        };
+    }
+
+    calculatePeopleOverTime(data: IData[]): IPeopleOverTime {
+        const timeBuckets: { [key: string]: number } = {};
+        for (let hour = 0; hour < 24; hour++) {
+            timeBuckets[hour] = 0;
+        }
+
+        data.forEach((item) => {
+            const detectedTime = dayjs(item.detected_time, 'DD/MM/YY HH:mm:ss', true);
+            if (detectedTime.isValid()) {
+                const hour = detectedTime.hour();
+                timeBuckets[hour] = (timeBuckets[hour] || 0) + 1;
+            }
+        });
+
+        const times = Object.keys(timeBuckets).map((hour) => `${hour}:00`);
+        const counts = Object.values(timeBuckets);
+
+        return { times, counts };
+    }
+
+    calculateFrequencyByWeekday(data: IData[]): IfrequecyByWeek {
+        const weekdays = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
+
+        const frequency: { [key: string]: number } = {};
+        weekdays.forEach((day) => (frequency[day] = 0));
+
+        data.forEach((item) => {
+            const detectedTime = dayjs(item.detected_time, 'DD/MM/YY HH:mm:ss', true);
+            if (detectedTime.isValid()) {
+                const weekday = weekdays[detectedTime.day()]; // Obtem o nome do dia da semana
+                frequency[weekday]++;
+            }
+        });
+
+        return {
+            days: Object.keys(frequency),
+            counts: Object.values(frequency),
+        };
+    }
+
+    calculateGenderProportionByPeriod(data: IData[]): IGenderProportionByPeriod {
+        const periods = ['Manhã (6h-12h)', 'Tarde (12h-18h)', 'Noite (18h-24h)', 'Madrugada (0h-6h)'];
+
+        const genderCounts: { [key: string]: { male: number; female: number } } = {};
+        periods.forEach((period) => {
+            genderCounts[period] = { male: 0, female: 0 };
+        });
+
+        data.forEach((item) => {
+            const detectedTime = dayjs(item.detected_time, 'DD/MM/YY HH:mm:ss', true);
+            if (detectedTime.isValid()) {
+                const hour = detectedTime.hour();
+                let period = '';
+
+                if (hour >= 6 && hour < 12) {
+                    period = 'Manhã (6h-12h)';
+                } else if (hour >= 12 && hour < 18) {
+                    period = 'Tarde (12h-18h)';
+                } else if (hour >= 18 && hour < 24) {
+                    period = 'Noite (18h-24h)';
+                } else {
+                    period = 'Madrugada (0h-6h)';
+                }
+
+                if (item.gender === 'masculino') {
+                    genderCounts[period].male++;
+                } else if (item.gender === 'feminino') {
+                    genderCounts[period].female++;
+                }
+            }
+        });
+
+        return {
+            labels: Object.keys(genderCounts),
+            male: Object.values(genderCounts).map((count) => count.male),
+            female: Object.values(genderCounts).map((count) => count.female),
         };
     }
 
