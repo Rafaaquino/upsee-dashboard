@@ -7,7 +7,8 @@ import { IParamsData } from './models/params-data.interface';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { firstValueFrom } from 'rxjs';
 import { MockDataService } from './service/MockData.service';
-import { IFrequencyByTimeRange, IGender, IGenderFormatTime } from './models/data.interface';
+import { IData, IFrequencyByTimeRange, IGender, IGenderFormatTime, IScoreTotal } from './models/data.interface';
+import { FlatpickrOptions } from 'ng2-flatpickr';
 
 @Component({
     moduleId: module.id,
@@ -26,15 +27,22 @@ export class IndexComponent implements OnInit {
     dailySales: any;
     totalOrders: any;
     uniqueVisitor: any;
+    lineTimeHours: any;
+    hitRate: any;
     isLoading = true;
     filterForm: FormGroup;
-    fetchData: any;
+    fetchData: IData[] = [];
     averageStayTime: any;
+    genderProportionByPeriod: any;
+    frequencyByWeekday: any;
     gender: any;
-    genderScore: any;
+    totalPeople: any;
+    totalScore: IScoreTotal = { genderScore: 0, personScore: 0 };
     genderFormatTime: IGenderFormatTime = { male: '00:00:00', female: '00:00:00' };
     frequencyByTimeRange: IFrequencyByTimeRange = { morning: 0, afternoon: 0, evening: 0, night: 0 };
     params: IParamsData = { cliente_id: '21122024', from: '21/12/24', to: '21/12/24' };
+    basic: FlatpickrOptions;
+    basicEnd: FlatpickrOptions;
 
     constructor(
         public storeData: Store<any>,
@@ -45,12 +53,23 @@ export class IndexComponent implements OnInit {
     ) {
         this.initStore();
         this.isLoading = false;
-
         this.filterForm = this.fb.group({
             dateFilter: ['today'], // Options: 'today', 'month', 'year', 'range'
             startDate: [null],
             endDate: [null],
         });
+
+        this.basic = {
+            defaultDate: '00/00/00 00:00:00',
+            dateFormat: 'DD/MM/YY HH:mm:ss',
+            position: this.store.rtlClass === 'rtl' ? 'auto right' : 'auto left',
+        };
+
+        this.basicEnd = {
+            defaultDate: '00/00/00  00:00:00',
+            dateFormat: 'DD/MM/YY HH:mm:ss',
+            position: this.store.rtlClass === 'rtl' ? 'auto right' : 'auto left',
+        };
 
         this.initializeData(); // Usamos uma função separada para garantir a inicialização síncrona
     }
@@ -251,6 +270,48 @@ export class IndexComponent implements OnInit {
             ],
         };
 
+        //lineTimeHours
+        this.lineTimeHours = {
+            chart: {
+                type: 'line', // Altere para 'area' se desejar
+                height: 350,
+                toolbar: {
+                    show: false, // Desativa a toolbar
+                },
+            },
+            xaxis: {
+                categories: [],
+                title: {
+                    text: 'Horários',
+                },
+            },
+            stroke: {
+                curve: 'smooth',
+            },
+            fill: {
+                type: 'gradient',
+                gradient: {
+                    shade: 'light',
+                    type: 'horizontal',
+                    shadeIntensity: 0.5,
+                    gradientToColors: undefined,
+                    inverseColors: true,
+                    opacityFrom: 0.7,
+                    opacityTo: 0.9,
+                    stops: [0, 50, 100],
+                },
+            },
+            dataLabels: {
+                enabled: false,
+            },
+            series: [
+                {
+                    name: 'Pessoas',
+                    data: [],
+                },
+            ],
+        };
+
         //
         this.uniqueVisitor = {
             chart: {
@@ -347,6 +408,87 @@ export class IndexComponent implements OnInit {
             ],
         };
 
+        //HitRate
+        this.hitRate = {
+            series: [75],
+            chart: {
+                height: 350,
+                type: 'radialBar',
+                toolbar: {
+                    show: false,
+                },
+            },
+            plotOptions: {
+                radialBar: {
+                    startAngle: -135,
+                    endAngle: 225,
+                    hollow: {
+                        margin: 0,
+                        size: '70%',
+                        background: '#fff',
+                        image: undefined,
+                        imageOffsetX: 0,
+                        imageOffsetY: 0,
+                        position: 'front',
+                        dropShadow: {
+                            enabled: true,
+                            top: 3,
+                            left: 0,
+                            blur: 4,
+                            opacity: 0.5,
+                        },
+                    },
+                    track: {
+                        background: '#fff',
+                        strokeWidth: '67%',
+                        margin: 0, // margin is in pixels
+                        dropShadow: {
+                            enabled: true,
+                            top: -3,
+                            left: 0,
+                            blur: 4,
+                            opacity: 0.7,
+                        },
+                    },
+
+                    dataLabels: {
+                        show: true,
+                        name: {
+                            offsetY: -10,
+                            show: true,
+                            color: '#888',
+                            fontSize: '17px',
+                        },
+                        value: {
+                            formatter: function (val: any) {
+                                return parseInt(val);
+                            },
+                            color: '#111',
+                            fontSize: '36px',
+                            show: true,
+                        },
+                    },
+                },
+            },
+            fill: {
+                type: 'gradient',
+                gradient: {
+                    shade: 'dark',
+                    type: 'horizontal',
+                    shadeIntensity: 0.5,
+                    gradientToColors: ['#ABE5A1'],
+                    inverseColors: true,
+                    opacityFrom: 1,
+                    opacityTo: 1,
+                    stops: [0, 100],
+                },
+            },
+            stroke: {
+                lineCap: 'round',
+            },
+            labels: ['Porcentagem'],
+        };
+
         // sales by category
         this.salesByCategory = {
             chart: {
@@ -393,7 +535,6 @@ export class IndexComponent implements OnInit {
                                 color: isDark ? '#bfc9d4' : undefined,
                                 offsetY: 16,
                                 formatter: (val: any) => {
-                                    console.log('val', val);
                                     return val;
                                 },
                             },
@@ -404,7 +545,6 @@ export class IndexComponent implements OnInit {
                                 fontSize: '29px',
                                 formatter: (w: any) => {
                                     return w.globals.seriesTotals.reduce(function (a: any, b: any) {
-                                        console.log('a', a + b), console.log('b', b);
                                         return a + b;
                                     }, 0);
                                 },
@@ -562,16 +702,117 @@ export class IndexComponent implements OnInit {
                 },
             ],
         };
+
+        //frequencyByWeekday
+        this.frequencyByWeekday = {
+            series: [
+                {
+                    name: 'Frequência',
+                    data: [],
+                },
+            ],
+            chart: {
+                type: 'bar', // Ou 'column' para gráfico de colunas
+                height: 350,
+                toolbar: {
+                    show: false, // Remove a toolbar
+                },
+            },
+            xaxis: {
+                categories: [], // Dias da semana
+                title: {
+                    text: 'Dia da Semana',
+                },
+            },
+            yaxis: {
+                title: {
+                    text: 'Número de Pessoas',
+                },
+            },
+            dataLabels: {
+                enabled: false,
+            },
+            plotOptions: {
+                bar: {
+                    borderRadius: 4,
+                    horizontal: false, // Altere para true para barras horizontais
+                },
+            },
+            fill: {
+                opacity: 1,
+            },
+            colors: ['#1E90FF'], // Cor opcional
+        };
+
+        //
+        this.genderProportionByPeriod = {
+            series: [
+                {
+                    name: 'Masculino',
+                    data: [],
+                },
+                {
+                    name: 'Feminino',
+                    data: [],
+                },
+            ],
+            chart: {
+                type: 'bar', // Altere para 'donut' para gráfico de rosca
+                height: 350,
+                stacked: false, // Empilhamento
+                toolbar: {
+                    show: false, // Remove a toolbar
+                },
+            },
+            xaxis: {
+                categories: [], // Faixas horárias
+                title: {
+                    text: 'Período do Dia',
+                },
+            },
+            yaxis: {
+                title: {
+                    text: 'Quantidade',
+                },
+            },
+            fill: {
+                opacity: 1,
+            },
+            colors: ['#1E90FF', '#FF69B4'], // Azul e rosa para representar gêneros
+            plotOptions: {
+                bar: {
+                    horizontal: false,
+                },
+            },
+            dataLabels: {
+                enabled: false,
+            },
+            legend: {
+                position: 'top',
+            },
+        };
     }
 
     updateChart(): void {
         const filteredData = this._filterService.filterData(this.fetchData, this.filterForm.value);
+
         const genderCountByMonth = this._filterService.countGenderByMonth(filteredData);
         console.log('genderCountByMonth', genderCountByMonth);
-        this.genderScore = this._filterService.calculateGenderScoreAverage(filteredData);
-        console.log('genderScore', this.genderScore);
+        genderCountByMonth.map((monthData) => {
+            this.totalPeople = monthData.male + monthData.female;
+        });
+
+        console.log('totalPeople', this.totalPeople);
+
+        this.totalScore = this._filterService.calculateGenderScoreAverage(filteredData);
+        console.log('totalScore', this.totalScore);
+        const hitRatePercent = this.totalScore?.personScore?.toFixed(1).toString();
+
+        console.log('hitRatePercent', hitRatePercent);
+
         const isDark = this.store.theme === 'dark' || this.store.isDarkMode ? true : false;
         const isRtl = this.store.rtlClass === 'rtl' ? true : false;
+
         this.averageStayTime = this._filterService.calculateAverageStayTime(filteredData);
         console.log(`Média de Permanência: ${this.averageStayTime}`);
 
@@ -580,6 +821,14 @@ export class IndexComponent implements OnInit {
 
         this.frequencyByTimeRange = this._filterService.calculateFrequencyByTimeRange(filteredData);
         console.log('Frequência por Faixa Horária:', this.frequencyByTimeRange);
+
+        const peopleData = this._filterService.calculatePeopleOverTime(filteredData);
+
+        const weekdayData = this._filterService.calculateFrequencyByWeekday(filteredData);
+        console.log('Frequência por semana:', weekdayData);
+
+        const proportionData = this._filterService.calculateGenderProportionByPeriod(filteredData);
+        console.log('Frequência por genero:', proportionData);
 
         this.uniqueVisitor = {
             ...this.uniqueVisitor,
@@ -607,14 +856,61 @@ export class IndexComponent implements OnInit {
             series: this._filterService.filterGenderCounts(filteredData).series,
         };
 
-        // this.totalOrders = {
-        //     ...this.totalOrders,
-        //     series: [
-        //         {
-        //             name: this._filterService.calculateAverageStayTime(filteredData),
-        //             data: [28, 40, 36, 52, 38, 60, 38, 52, 36, 40],
-        //         },
-        //     ],
-        // };
+        this.lineTimeHours = {
+            ...this.lineTimeHours,
+            series: [
+                {
+                    name: 'Pessoas',
+                    data: peopleData.counts,
+                },
+            ],
+            xaxis: {
+                categories: peopleData.times,
+                title: {
+                    text: 'Horários mais movimentados',
+                },
+            },
+        };
+
+        this.hitRate = {
+            ...this.hitRate,
+            series: [hitRatePercent],
+        };
+
+        this.frequencyByWeekday = {
+            ...this.frequencyByWeekday,
+            series: [
+                {
+                    name: 'Frequência',
+                    data: weekdayData.counts,
+                },
+            ],
+            xaxis: {
+                categories: weekdayData.days, // Dias da semana
+                title: {
+                    text: 'Dia da Semana',
+                },
+            },
+        };
+
+        this.genderProportionByPeriod = {
+            ...this.genderProportionByPeriod,
+            series: [
+                {
+                    name: 'Masculino',
+                    data: proportionData.male,
+                },
+                {
+                    name: 'Feminino',
+                    data: proportionData.female,
+                },
+            ],
+            xaxis: {
+                categories: proportionData.labels, // Faixas horárias
+                title: {
+                    text: 'Período do Dia',
+                },
+            },
+        };
     }
 }
