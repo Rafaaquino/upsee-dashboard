@@ -43,3 +43,9 @@ h1 {
 .fs-1 {
     font-size: 1.2rem;
 }
+
+.bg-grey-chart {
+    background: rgb(136 142 168 / 61%);
+    padding: 8px;
+    border-radius: 5px;
+}
