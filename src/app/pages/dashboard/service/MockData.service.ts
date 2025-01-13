@@ -22,13 +22,14 @@ export class MockDataService {
 
         // Função para gerar a data no formato DD/MM/YY HH:mm:ss
         const generateDate = (month: number): string => {
+            const today = new Date().getDate();
             const day = String(Math.floor(Math.random() * 28) + 1).padStart(2, '0'); // Garante um valor de dia entre 01 e 28
             const hour = String(Math.floor(Math.random() * 24)).padStart(2, '0'); // Hora entre 00 e 23
             const minute = String(Math.floor(Math.random() * 60)).padStart(2, '0'); // Minuto entre 00 e 59
             const second = String(Math.floor(Math.random() * 60)).padStart(2, '0'); // Segundo entre 00 e 59
 
             // O formato de data final será 'DD/MM/YY HH:mm:ss'
-            return `30/${String(month + 1).padStart(2, '0')}/24 ${hour}:${minute}:${second}`;
+            return `${today}/${String(month + 1).padStart(2, '0')}/25 ${hour}:${minute}:${second}`;
         };
 
         for (let month = 0; month < 12; month++) {

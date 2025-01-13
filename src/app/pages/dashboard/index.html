@@ -26,14 +26,14 @@
                         <div *ngIf="filterForm.get('dateFilter')?.value === 'range'" class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div class="">
                                 <label for="startDate">Início:</label>
-                                <!-- <input id="startDate" class="form-input" type="date" formControlName="startDate" /> -->
-                                <ng2-flatpickr [config]="basic" formControlName="startDate" addClass="form-input"></ng2-flatpickr>
+                                <input id="startDate" class="form-input" type="date" formControlName="startDate" />
+                                <!-- <ng2-flatpickr [config]="basic" formControlName="startDate" addClass="form-input"></ng2-flatpickr> -->
                             </div>
 
                             <div class="">
                                 <label for="endDate">Fim:</label>
-                                <!-- <input id="endDate" class="form-input" type="date" formControlName="endDate" /> -->
-                                <ng2-flatpickr [config]="basic" formControlName="endDate" addClass="form-input"></ng2-flatpickr>
+                                <input id="endDate" class="form-input" type="date" formControlName="endDate" />
+                                <!-- <ng2-flatpickr [config]="basic" formControlName="endDate" addClass="form-input"></ng2-flatpickr> -->
                             </div>
                         </div>
                     </div>
@@ -111,7 +111,7 @@
                 <div class="mb-5 flex items-center justify-between dark:text-white-light">
                     <h5 class="text-lg font-semibold">GÊNERO</h5>
                 </div>
-                <p class="text-lg dark:text-white-light/90">Taxa de acerto<span class="ml-2 text-primary">{{ totalScore?.genderScore?.toFixed(1)}}%</span></p>
+                <p class="text-lg dark:text-white-light/90">Taxa de acerto<span class="ml-2 text-primary">{{ totalScore.genderScore | percent}}%</span></p>
                 <div class="relative overflow-hidden">
                     <!-- [dropShadow]="revenueChart.dropShadow" -->
                     <apx-chart

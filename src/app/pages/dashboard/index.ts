@@ -794,6 +794,7 @@ export class IndexComponent implements OnInit {
     }
 
     updateChart(): void {
+        debugger;
         const filteredData = this._filterService.filterData(this.fetchData, this.filterForm.value);
 
         const genderCountByMonth = this._filterService.countGenderByMonth(filteredData);

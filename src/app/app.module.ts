@@ -21,16 +21,6 @@ import { ModalModule } from 'angular-custom-modal';
 import { SortablejsModule } from '@dustfoundation/ngx-sortablejs';
 import { QuillModule } from 'ngx-quill';
 import { IndexComponent } from './pages/dashboard/index';
-import { AnalyticsComponent } from './analytics';
-import { FinanceComponent } from './pages/dashboard/components/finance/finance';
-import { CryptoComponent } from './crypto';
-import { WidgetsComponent } from './widgets';
-import { TablesComponent } from './tables';
-import { FontIconsComponent } from './font-icons';
-import { ChartsComponent } from './charts';
-import { DragndropComponent } from './dragndrop';
-import { KnowledgeBaseComponent } from './pages/knowledge-base';
-import { FaqComponent } from './pages/faq';
 import { AppLayout } from './shared/layouts/app-layout';
 import { AuthLayout } from './shared/layouts/auth-layout';
 
@@ -83,19 +73,9 @@ import { Ng2FlatpickrModule } from 'ng2-flatpickr';
         SidebarComponent,
         SigninComponent,
         ThemeCustomizerComponent,
-        TablesComponent,
-        FontIconsComponent,
-        ChartsComponent,
         IndexComponent,
-        AnalyticsComponent,
-        FinanceComponent,
-        CryptoComponent,
-        WidgetsComponent,
-        DragndropComponent,
         AppLayout,
         AuthLayout,
-        KnowledgeBaseComponent,
-        FaqComponent,
     ],
 
     providers: [

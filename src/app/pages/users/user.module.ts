@@ -5,8 +5,8 @@ import { Routes, RouterModule } from '@angular/router';
 // icon
 import { IconModule } from 'src/app/shared/icon/icon.module';
 
-import { UserAccountSettingsComponent } from './user-account-settings';
 import { ProfileComponent } from './components/profile/profile';
+import { UserAccountSettingsComponent } from './components/account/user-account-settings';
 
 const routes: Routes = [
     {

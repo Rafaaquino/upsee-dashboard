@@ -21,7 +21,7 @@
                 <icon-home />
                 Home
             </a>
-            <a
+            <!-- <a
                 href="javascript:;"
                 class="flex gap-2 border-b border-transparent p-4 !outline-none hover:border-primary hover:text-primary"
                 [ngClass]="{ '!border-primary text-primary':  activeTab.toLowerCase() === 'payment-detail'}"
@@ -47,7 +47,7 @@
             >
                 <icon-phone />
                 Danger Zone
-            </a>
+            </a> -->
         </div>
         <div>
             <div *ngIf="activeTab.toLowerCase() === 'home'">
@@ -115,25 +115,25 @@
                     <h6 class="mb-5 text-lg font-bold">Social</h6>
                     <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
                         <div class="flex">
-                            <div class="flex items-center justify-center rounded bg-[#eee] px-3 font-semibold ltr:mr-2 rtl:ml-2 dark:bg-[#1b2e4b]">
+                            <div class="flex items-center justify-center rounded bg-[#eee] px-3 font-semibold dark:bg-[#1b2e4b] ltr:mr-2 rtl:ml-2">
                                 <icon-linkedin class="h-5 w-5" />
                             </div>
                             <input type="text" placeholder="jimmy_turner" class="form-input" />
                         </div>
                         <div class="flex">
-                            <div class="flex items-center justify-center rounded bg-[#eee] px-3 font-semibold ltr:mr-2 rtl:ml-2 dark:bg-[#1b2e4b]">
+                            <div class="flex items-center justify-center rounded bg-[#eee] px-3 font-semibold dark:bg-[#1b2e4b] ltr:mr-2 rtl:ml-2">
                                 <icon-twitter class="h-5 w-5" />
                             </div>
                             <input type="text" placeholder="jimmy_turner" class="form-input" />
                         </div>
                         <div class="flex">
-                            <div class="flex items-center justify-center rounded bg-[#eee] px-3 font-semibold ltr:mr-2 rtl:ml-2 dark:bg-[#1b2e4b]">
+                            <div class="flex items-center justify-center rounded bg-[#eee] px-3 font-semibold dark:bg-[#1b2e4b] ltr:mr-2 rtl:ml-2">
                                 <icon-facebook class="h-5 w-5" />
                             </div>
                             <input type="text" placeholder="jimmy_turner" class="form-input" />
                         </div>
                         <div class="flex">
-                            <div class="flex items-center justify-center rounded bg-[#eee] px-3 font-semibold ltr:mr-2 rtl:ml-2 dark:bg-[#1b2e4b]">
+                            <div class="flex items-center justify-center rounded bg-[#eee] px-3 font-semibold dark:bg-[#1b2e4b] ltr:mr-2 rtl:ml-2">
                                 <icon-github />
                             </div>
                             <input type="text" placeholder="jimmy_turner" class="form-input" />
