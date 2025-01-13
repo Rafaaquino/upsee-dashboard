@@ -43,6 +43,8 @@ export class AuthService {
 
     logout() {
         localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        localStorage.removeItem('userId');
         this.router.navigateByUrl('auth/singnin');
     }
 }
