@@ -4,9 +4,9 @@ import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
 import { AppService } from 'src/app/service/app.service';
-import { SigninService } from '../../services/signin.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ILoginResponse } from '../../models/login-response.interface';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
     moduleId: module.id,
@@ -31,7 +31,7 @@ export class SigninComponent implements OnInit {
         public router: Router,
         private appSetting: AppService,
         private fb: FormBuilder,
-        private _signinService: SigninService
+        private _authService: AuthService
     ) {
         this.initStore();
         this.loginForm = this.fb.group({
@@ -48,7 +48,7 @@ export class SigninComponent implements OnInit {
 
     submit() {
         if (this.loginForm.valid) {
-            this._signinService.login(this.loginForm.value).subscribe({
+            this._authService.login(this.loginForm.value).subscribe({
                 next: this.onSubmitSuccess.bind(this),
                 error: this.onSubmitError.bind(this),
             });

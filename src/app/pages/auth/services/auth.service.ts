@@ -1,50 +1,36 @@
 import { Injectable } from '@angular/core';
-import { Router } from '@angular/router';
-import { jwtDecode } from 'jwt-decode';
-import { BehaviorSubject } from 'rxjs';
-import { User } from '../models/user.interface';
-import { UserService } from 'src/app/pages/users/services/user.service';
+import { Observable } from 'rxjs';
+import { ILoginResponse } from '../models/login-response.interface';
+import { Ilogin } from '../models/login.interface';
+import { environment } from 'src/environments/environment.dev';
+import { HttpClient } from '@angular/common/http';
+import { IResetPassword } from '../models/reset-password.interface';
 
 @Injectable({
     providedIn: 'root',
 })
 export class AuthService {
-    constructor(private router: Router, private user: UserService) {}
+    constructor(private http: HttpClient) {}
 
-    isUserLoggedin() {
-        const token = this.getAuthorizationToken();
-        if (!token) return false;
-        if (this.isTokenExpired(token)) return false;
-        return true;
+    login(login: Ilogin): Observable<ILoginResponse> {
+        return this.http.post<ILoginResponse>(environment.host_api + environment.api_verions + environment.host_auth + `/login`, login);
     }
 
-    getAuthorizationToken() {
-        return localStorage.getItem('token');
+    forgotPassword(email: string): Observable<string> {
+        return this.http.post<string>(environment.host_api + environment.api_verions + environment.host_auth + `/forgot-password`, email);
     }
 
-    tokenExpiration(token: string): any {
-        const decoded: any = jwtDecode(token);
-        console.log(decoded);
-        this.user.setUser(decoded);
-        if (decoded.exp === undefined) return null;
-        return decoded;
+    codeAuthPass(code: string, email: string): Observable<ILoginResponse> {
+        return this.http.post<ILoginResponse>(environment.host_api + environment.api_verions + environment.host_auth + `/code-auth-recovery-password`, {
+            code,
+            email,
+        });
     }
 
-    isTokenExpired(token: string): boolean {
-        if (!token) return true;
-
-        const decoded = this.tokenExpiration(token);
-        const currentTime = Date.now() / 1000;
-
-        if (decoded === undefined) return false;
-
-        return !(decoded.exp > currentTime);
-    }
-
-    logout() {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        localStorage.removeItem('userId');
-        this.router.navigateByUrl('auth/singnin');
+    resetPassword(newPass: IResetPassword, email: string): Observable<any> {
+        return this.http.post<any>(environment.host_api + environment.api_verions + environment.host_auth + `/reset-password`, {
+            newPass,
+            email,
+        });
     }
 }

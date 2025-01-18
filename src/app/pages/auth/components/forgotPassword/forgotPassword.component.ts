@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
-import { ForgotPasswordService } from '../../services/forgotPassword.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
     moduleId: module.id,
@@ -26,7 +26,7 @@ export class ForgotPasswordComponent implements OnInit {
         public translate: TranslateService,
         public storeData: Store<any>,
         public router: Router,
-        private _forgotPassService: ForgotPasswordService,
+        private _authService: AuthService,
         private fb: FormBuilder
     ) {
         this.initStore();
@@ -51,7 +51,7 @@ export class ForgotPasswordComponent implements OnInit {
 
     submit() {
         if (this.forgotPassForm.valid) {
-            this._forgotPassService.forgotPassword(this.forgotPassForm.value).subscribe({
+            this._authService.forgotPassword(this.forgotPassForm.value).subscribe({
                 next: this.onSubmitSuccess.bind(this),
                 error: this.onSubmitError.bind(this),
             });

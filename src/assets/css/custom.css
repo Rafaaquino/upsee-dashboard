@@ -1,5 +1,5 @@
 :root {
-    --primary-color: #ea580c;
+    --custom-color: #ea580c;
     --primary-rgb: hexToRGB(#ea580c);
     --light: #f8fbff;
     --light-rgb: hexToRGB(#f8fbff);
@@ -12,7 +12,7 @@
 }
 
 .text-primary {
-    color: var(--primary-color) !important;
+    color: var(--custom-color) !important;
 }
 
 .btn-gradient {
@@ -24,7 +24,7 @@
 }
 
 h1 {
-    color: var(--primary-color);
+    color: var(--custom-color);
 }
 
 .bg-white\/60 {

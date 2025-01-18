@@ -8,8 +8,8 @@ import { SignupComponent } from './components/singup/boxed-signup';
 import { MenuModule } from 'headlessui-angular';
 import { CodeAuthenticateComponent } from './components/codeAuthenticate/codeAuthenticate.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { AuthGuardService } from '../../service/authGuard.service';
 import { ForgotPasswordComponent } from './components/forgotPassword/forgotPassword.component';
+import { AuthGuardService } from 'src/app/core/guards/authGuard.service';
 
 const routes: Routes = [
     { path: 'auth/code-authenticate', component: CodeAuthenticateComponent, title: 'Codigo de Autenticação | UPSEE - Dashboard' },

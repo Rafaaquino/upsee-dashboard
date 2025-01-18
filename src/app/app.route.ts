@@ -4,8 +4,8 @@ import { Routes } from '@angular/router';
 import { IndexComponent } from './pages/dashboard/index';
 import { AppLayout } from './shared/layouts/app-layout';
 import { AuthLayout } from './shared/layouts/auth-layout';
-import { AuthGuardService } from './service/authGuard.service';
-import { Error404Component } from './shared/erros/error404';
+import { Error404Component } from './shared/errors/error404';
+import { AuthGuardService } from './core/guards/authGuard.service';
 
 export const routes: Routes = [
     {

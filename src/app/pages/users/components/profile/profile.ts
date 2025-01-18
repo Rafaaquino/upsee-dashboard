@@ -18,5 +18,6 @@ export class ProfileComponent {
 
     constructor(private _userService: UserService) {
         this.user = this._userService.getUser();
+        console.log(this.user);
     }
 }

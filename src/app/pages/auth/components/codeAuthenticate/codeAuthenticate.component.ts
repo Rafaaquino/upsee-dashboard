@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
-import { ForgotPasswordService } from '../../services/forgotPassword.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
     moduleId: module.id,
@@ -27,7 +27,7 @@ export class CodeAuthenticateComponent {
         public storeData: Store<any>,
         public router: Router,
         private fb: FormBuilder,
-        private _forgotPassService: ForgotPasswordService
+        private _authService: AuthService
     ) {
         this.initStore();
         this.codeAuthForm = this.fb.group({
@@ -53,7 +53,7 @@ export class CodeAuthenticateComponent {
         if (this.codeAuthForm.valid) {
             const email = localStorage.getItem('email') as string;
             const code = this.codeAuthForm.get('code')?.value;
-            this._forgotPassService.codeAuthPass(code, email).subscribe({
+            this._authService.codeAuthPass(code, email).subscribe({
                 next: this.onSubmitSuccess.bind(this),
                 error: this.onSubmitError.bind(this),
             });

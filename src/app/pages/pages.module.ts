@@ -5,10 +5,10 @@ import { Routes, RouterModule } from '@angular/router';
 // icon
 import { IconModule } from 'src/app/shared/icon/icon.module';
 
-import { Error404Component } from '../shared/erros/error404';
-import { Error500Component } from '../shared/erros/error500';
-import { Error503Component } from '../shared/erros/error503';
-import { MaintenenceComponent } from '../shared/erros/maintenence';
+import { Error404Component } from '../shared/errors/error404';
+import { Error500Component } from '../shared/errors/error500';
+import { Error503Component } from '../shared/errors/error503';
+import { MaintenenceComponent } from '../shared/errors/maintenence';
 
 // headlessui
 import { MenuModule } from 'headlessui-angular';

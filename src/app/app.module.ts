@@ -31,13 +31,14 @@ import { ThemeCustomizerComponent } from './shared/layouts/theme-customizer';
 import { IconModule } from './shared/icon/icon.module';
 import { AuthModule } from './pages/auth/auth.module';
 import { SigninComponent } from './pages/auth/components/singnin/signin.component';
-import { AuthInterceptor } from './pages/auth/interceptor/auth.interceptor';
+import { AuthInterceptor } from './core/interceptors/auth.interceptor';
 import { Ng2FlatpickrModule } from 'ng2-flatpickr';
+import { ErrorHandlerModule } from './core/error-handler/error-handler.module';
+import { ErrorInterceptor } from './core/interceptors/error.interceptor';
 
 @NgModule({
     imports: [
         RouterModule.forRoot(routes, { scrollPositionRestoration: 'enabled' }),
-        BrowserModule,
         BrowserModule,
         BrowserAnimationsModule,
         CommonModule,
@@ -65,6 +66,7 @@ import { Ng2FlatpickrModule } from 'ng2-flatpickr';
         Ng2FlatpickrModule,
         QuillModule.forRoot(),
         IconModule,
+        ErrorHandlerModule,
     ],
     declarations: [
         AppComponent,
@@ -82,6 +84,7 @@ import { Ng2FlatpickrModule } from 'ng2-flatpickr';
         AppService,
         Title,
         { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+        { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
         {
             provide: HIGHLIGHT_OPTIONS,
             useValue: {

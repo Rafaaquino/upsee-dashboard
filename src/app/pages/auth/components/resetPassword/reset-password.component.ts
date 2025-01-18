@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
-import { ForgotPasswordService } from '../../services/forgotPassword.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
     moduleId: module.id,
@@ -27,7 +27,7 @@ export class PasswordResetComponent implements OnInit {
         public translate: TranslateService,
         public storeData: Store<any>,
         public router: Router,
-        private _forgotPassService: ForgotPasswordService,
+        private _authService: AuthService,
         private fb: FormBuilder
     ) {
         this.initStore();
@@ -62,7 +62,7 @@ export class PasswordResetComponent implements OnInit {
 
         if (this.resetPassForm.valid) {
             const email = localStorage.getItem('email') as string;
-            this._forgotPassService.resetPassword(this.resetPassForm.value, email).subscribe({
+            this._authService.resetPassword(this.resetPassForm.value, email).subscribe({
                 next: this.onSubmitSuccess.bind(this),
                 error: this.onSubmitError.bind(this),
             });

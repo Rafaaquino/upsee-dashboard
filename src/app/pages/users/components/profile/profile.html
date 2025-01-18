@@ -18,48 +18,31 @@
                 </div>
                 <div class="mb-5">
                     <div class="flex flex-col items-center justify-center">
-                        <img src="/assets/images/profile-34.jpeg" alt="" class="mb-5 h-24 w-24 rounded-full object-cover" />
-                        <p class="text-xl font-semibold text-primary">{{user.name}}</p>
+                        <img src="/assets/images/user-profile.png" alt="" class="mb-5 h-24 w-24 rounded-full object-cover" />
+                        <p class="text-xl font-semibold text-primary">{{user.profile.firstName}} {{user.profile.lastName}}</p>
                     </div>
                     <ul class="m-auto mt-5 flex max-w-[160px] flex-col space-y-4 font-semibold text-white-dark">
-                        <li class="flex items-center gap-2">
+                        <!-- <li class="flex items-center gap-2">
                             <icon-coffee class="shrink-0" />
-                            Web Developer
-                        </li>
+                            {{user.profile.}}
+                        </li> -->
                         <li class="flex items-center gap-2">
                             <icon-calendar class="shrink-0" />
-                            Jan 20, 1989
+                            {{user.profile.dateOfBirth}}
                         </li>
                         <li class="flex items-center gap-2">
                             <icon-map-pin class="shrink-0" />
-                            New York, USA
+                            {{user.profile.address.city}}, {{user.profile.address.state}}
                         </li>
                         <li>
                             <a href="javascript:;" class="flex items-center gap-2">
                                 <icon-mail class="h-5 w-5 shrink-0" />
-                                <span class="truncate text-primary">{{user.email}}</span></a
+                                <span class="truncate text-primary">{{user.profile.email}}</span></a
                             >
                         </li>
                         <li class="flex items-center gap-2">
                             <icon-phone />
-                            <span class="whitespace-nowrap" dir="ltr">+1 (530) 555-12121</span>
-                        </li>
-                    </ul>
-                    <ul class="mt-7 flex items-center justify-center gap-2">
-                        <li>
-                            <a class="btn btn-info flex h-10 w-10 items-center justify-center rounded-full p-0" href="javascript:;">
-                                <icon-twitter class="h-5 w-5" />
-                            </a>
-                        </li>
-                        <li>
-                            <a class="btn btn-danger flex h-10 w-10 items-center justify-center rounded-full p-0" href="javascript:;">
-                                <icon-dribbble />
-                            </a>
-                        </li>
-                        <li>
-                            <a class="btn btn-dark flex h-10 w-10 items-center justify-center rounded-full p-0" href="javascript:;">
-                                <icon-github />
-                            </a>
+                            <span class="whitespace-nowrap" dir="ltr">{{user.profile.contacts.mobilePhone}}</span>
                         </li>
                     </ul>
                 </div>
