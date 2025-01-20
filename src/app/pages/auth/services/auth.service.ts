@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ILoginResponse } from '../models/login-response.interface';
 import { Ilogin } from '../models/login.interface';
-import { environment } from 'src/environments/environment.dev';
+import { environment } from 'src/environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { IResetPassword } from '../models/reset-password.interface';
 
