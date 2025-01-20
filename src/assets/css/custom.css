@@ -49,3 +49,8 @@ h1 {
     padding: 8px;
     border-radius: 5px;
 }
+
+.btn-custom {
+    background-color: var(--custom-color);
+    border-color: var(--custom-color);
+}
