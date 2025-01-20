@@ -1,12 +1,17 @@
 {
     "name": "Upsee-Dashboard",
     "version": "1.0.0",
+    "engines": {
+        "node": "20.x",
+        "npm": "10.x"
+    },
     "scripts": {
         "ng": "ng",
-        "start": "ng serve --open --port 4201",
+        "start": "node server",
         "build": "ng build",
         "watch": "ng build --watch --configuration development",
         "test": "ng test",
+        "heroku-postbuild": "ng build --configuration=production",
         "deploy": "ng build --configuration production --base-href https://Rafaaquino.github.io/upsee-dashboard/ && cp dist/upsee-dashboard/index.html dist/upsee-dashboard/404.html && npx angular-cli-ghpages --dir=dist/upsee-dashboard"
     },
     "private": true,
