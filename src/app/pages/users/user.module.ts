@@ -7,6 +7,7 @@ import { IconModule } from 'src/app/shared/icon/icon.module';
 
 import { ProfileComponent } from './components/profile/profile';
 import { UserAccountSettingsComponent } from './components/account/user-account-settings';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 const routes: Routes = [
     {
@@ -17,7 +18,7 @@ const routes: Routes = [
     { path: 'users/profile', component: ProfileComponent, title: 'User Profile | VRISTO - Multipurpose Tailwind Dashboard Template' },
 ];
 @NgModule({
-    imports: [RouterModule.forChild(routes), CommonModule, IconModule],
+    imports: [RouterModule.forChild(routes), CommonModule, IconModule, FormsModule, ReactiveFormsModule],
     declarations: [UserAccountSettingsComponent, ProfileComponent],
 })
 export class UsersModule {}
