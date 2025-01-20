@@ -3,7 +3,7 @@
     "version": 1,
     "newProjectRoot": "projects",
     "projects": {
-        "vristo-angular": {
+        "upsee-dashboard": {
             "projectType": "application",
             "schematics": {},
             "root": "",
@@ -13,7 +13,7 @@
                 "build": {
                     "builder": "@angular-devkit/build-angular:browser",
                     "options": {
-                        "outputPath": "dist",
+                        "outputPath": "dist/upsee-dashboard",
                         "index": "src/index.html",
                         "main": "src/main.ts",
                         "polyfills": ["zone.js"],
@@ -71,10 +71,10 @@
                     "builder": "@angular-devkit/build-angular:dev-server",
                     "configurations": {
                         "production": {
-                            "browserTarget": "vristo-angular:build:production"
+                            "browserTarget": "upsee-dashboard:build:production"
                         },
                         "development": {
-                            "browserTarget": "vristo-angular:build:development"
+                            "browserTarget": "upsee-dashboard:build:development"
                         }
                     },
                     "defaultConfiguration": "development"
@@ -82,7 +82,7 @@
                 "extract-i18n": {
                     "builder": "@angular-devkit/build-angular:extract-i18n",
                     "options": {
-                        "browserTarget": "vristo-angular:build"
+                        "browserTarget": "upsee-dashboard:build"
                     }
                 },
                 "test": {
