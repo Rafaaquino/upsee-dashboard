@@ -1,0 +1,217 @@
+﻿<div [ngClass]="{ 'dark text-white-dark': store.semidark }">
+    <nav class="sidebar fixed bottom-0 top-0 z-50 h-full min-h-screen w-[260px] shadow-[5px_0_25px_0_rgba(94,92,154,0.1)] transition-all duration-300">
+        <div class="h-full bg-white dark:bg-[#0e1726]">
+            <div class="flex items-center justify-between px-4 py-3">
+                <a routerLink="/" class="main-logo flex shrink-0 items-center">
+                    <img class="ml-[5px] flex-none" src="/assets/images/upsee.svg" alt="" width="150px" />
+                </a>
+                <a
+                    href="javascript:;"
+                    class="collapse-icon flex h-8 w-8 items-center rounded-full transition duration-300 hover:bg-gray-500/10 hover:text-primary dark:text-white-light dark:hover:bg-dark-light/10 rtl:rotate-180"
+                    (click)="storeData.dispatch({ type: 'toggleSidebar'})"
+                >
+                    <icon-carets-down class="m-auto rotate-90" />
+                </a>
+            </div>
+            <ng-scrollbar class="relative !h-[calc(100vh-80px)]" appearance="compact">
+                <ul class="relative space-y-0.5 p-4 py-0 font-semibold">
+                    <li class="accordion menu nav-item">
+                        <button
+                            type="button"
+                            class="nav-link group w-full"
+                            [ngClass]="{ active: activeDropdown.includes('dashboard') }"
+                            (click)="toggleAccordion('dashboard')"
+                        >
+                            <div class="flex items-center">
+                                <icon-menu-dashboard class="shrink-0 group-hover:!text-primary" />
+
+                                <span class="text-black dark:text-[#506690] dark:group-hover:text-white-dark ltr:pl-3 rtl:pr-3">
+                                    {{ 'dashboard' | translate }}
+                                </span>
+                            </div>
+                            <div [ngClass]="{ 'rtl:rotate-90 -rotate-90': !activeDropdown.includes('dashboard') }">
+                                <icon-caret-down />
+                            </div>
+                        </button>
+                        <div [@slideDownUp]="!activeDropdown.includes('dashboard')" class="accordion-content">
+                            <ul class="sub-menu text-gray-500">
+                                <li>
+                                    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="toggleMobileMenu()"
+                                        >{{ 'Pessoas' | translate }}</a
+                                    >
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+
+                    <!-- <h2 class="-mx-4 mb-1 flex items-center bg-white-light/30 px-7 py-3 font-extrabold uppercase dark:bg-dark dark:bg-opacity-[0.08]">
+                        <icon-minus class="hidden h-5 w-4 flex-none" />
+                        <span>{{ ('apps' | translate) || '&nbsp;' }}</span>
+                    </h2>
+
+                    <li class="nav-item">
+                        <ul>
+                            <li class="nav-item">
+                                <a routerLink="/apps/chat" class="group" routerLinkActive="active" (click)="toggleMobileMenu()">
+                                    <div class="flex items-center">
+                                        <icon-menu-chat class="shrink-0 group-hover:!text-primary" />
+
+                                        <span class="text-black dark:text-[#506690] dark:group-hover:text-white-dark ltr:pl-3 rtl:pr-3"
+                                            >{{ 'chat' | translate }}</span
+                                        >
+                                    </div>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a routerLink="/apps/mailbox" class="group" routerLinkActive="active" (click)="toggleMobileMenu()">
+                                    <div class="flex items-center">
+                                        <icon-menu-mailbox class="shrink-0 group-hover:!text-primary" />
+
+                                        <span class="text-black dark:text-[#506690] dark:group-hover:text-white-dark ltr:pl-3 rtl:pr-3"
+                                            >{{ 'mailbox' | translate }}</span
+                                        >
+                                    </div>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a routerLink="/apps/todolist" class="group" routerLinkActive="active" (click)="toggleMobileMenu()">
+                                    <div class="flex items-center">
+                                        <icon-menu-todo class="shrink-0 group-hover:!text-primary" />
+
+                                        <span class="text-black dark:text-[#506690] dark:group-hover:text-white-dark ltr:pl-3 rtl:pr-3"
+                                            >{{ 'todo_list' | translate }}</span
+                                        >
+                                    </div>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a routerLink="/apps/notes" class="group" routerLinkActive="active" (click)="toggleMobileMenu()">
+                                    <div class="flex items-center">
+                                        <icon-menu-notes class="shrink-0 group-hover:!text-primary" />
+
+                                        <span class="text-black dark:text-[#506690] dark:group-hover:text-white-dark ltr:pl-3 rtl:pr-3"
+                                            >{{ 'notes' | translate }}</span
+                                        >
+                                    </div>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a routerLink="/apps/scrumboard" class="group" routerLinkActive="active" (click)="toggleMobileMenu()">
+                                    <div class="flex items-center">
+                                        <icon-menu-scrumboard class="shrink-0 group-hover:!text-primary" />
+
+                                        <span class="text-black dark:text-[#506690] dark:group-hover:text-white-dark ltr:pl-3 rtl:pr-3"
+                                            >{{ 'scrumboard' | translate }}</span
+                                        >
+                                    </div>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a routerLink="/apps/contacts" class="group" routerLinkActive="active" (click)="toggleMobileMenu()">
+                                    <div class="flex items-center">
+                                        <icon-menu-contacts class="shrink-0 group-hover:!text-primary" />
+
+                                        <span class="text-black dark:text-[#506690] dark:group-hover:text-white-dark ltr:pl-3 rtl:pr-3"
+                                            >{{ 'contacts' | translate }}</span
+                                        >
+                                    </div>
+                                </a>
+                            </li>
+
+                            <li class="accordion menu nav-item">
+                                <button
+                                    type="button"
+                                    class="nav-link group w-full"
+                                    [ngClass]="{ active: activeDropdown.includes('invoice') }"
+                                    (click)="toggleAccordion('invoice')"
+                                >
+                                    <div class="flex items-center">
+                                        <icon-menu-invoice class="shrink-0 group-hover:!text-primary" />
+
+                                        <span class="text-black dark:text-[#506690] dark:group-hover:text-white-dark ltr:pl-3 rtl:pr-3"
+                                            >{{ 'invoice' | translate }}</span
+                                        >
+                                    </div>
+                                    <div [ngClass]="{ 'rtl:rotate-90 -rotate-90': !activeDropdown.includes('invoice') }">
+                                        <icon-caret-down />
+                                    </div>
+                                </button>
+                                <div [@slideDownUp]="!activeDropdown.includes('invoice')" class="accordion-content">
+                                    <ul class="sub-menu text-gray-500">
+                                        <li>
+                                            <a routerLink="/apps/invoice/list" routerLinkActive="active" (click)="toggleMobileMenu()"
+                                                >{{ 'list' | translate }}</a
+                                            >
+                                        </li>
+                                        <li>
+                                            <a routerLink="/apps/invoice/preview" routerLinkActive="active" (click)="toggleMobileMenu()"
+                                                >{{ 'preview' | translate }}</a
+                                            >
+                                        </li>
+                                        <li>
+                                            <a routerLink="/apps/invoice/add" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'add' | translate }}</a>
+                                        </li>
+                                        <li>
+                                            <a routerLink="/apps/invoice/edit" routerLinkActive="active" (click)="toggleMobileMenu()"
+                                                >{{ 'edit' | translate }}</a
+                                            >
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+
+                            <li class="nav-item">
+                                <a routerLink="/apps/calendar" class="group" routerLinkActive="active" (click)="toggleMobileMenu()">
+                                    <div class="flex items-center">
+                                        <icon-menu-calendar class="shrink-0 group-hover:!text-primary" />
+
+                                        <span class="text-black dark:text-[#506690] dark:group-hover:text-white-dark ltr:pl-3 rtl:pr-3"
+                                            >{{ 'calendar' | translate }}</span
+                                        >
+                                    </div>
+                                </a>
+                            </li>
+                        </ul>
+                    </li> -->
+                    <!--
+                    <h2 class="-mx-4 mb-1 flex items-center bg-white-light/30 px-7 py-3 font-extrabold uppercase dark:bg-dark dark:bg-opacity-[0.08]">
+                        <icon-minus class="hidden h-5 w-4 flex-none" />
+                        <span>{{ ('Minha conta' | translate) || '&nbsp;' }}</span>
+                    </h2> -->
+
+                    <li class="accordion menu nav-item">
+                        <button
+                            type="button"
+                            class="nav-link group w-full"
+                            [ngClass]="{ active: activeDropdown.includes('users') }"
+                            (click)="toggleAccordion('users')"
+                        >
+                            <div class="flex items-center">
+                                <icon-menu-users class="shrink-0 group-hover:!text-primary" />
+
+                                <span class="text-black dark:text-[#506690] dark:group-hover:text-white-dark ltr:pl-3 rtl:pr-3"
+                                    >{{ 'Minha conta' | translate }}</span
+                                >
+                            </div>
+                            <div [ngClass]="{ 'rtl:rotate-90 -rotate-90': !activeDropdown.includes('users') }">
+                                <icon-caret-down />
+                            </div>
+                        </button>
+                        <div [@slideDownUp]="!activeDropdown.includes('users')" class="accordion-content">
+                            <ul class="sub-menu text-gray-500">
+                                <li>
+                                    <a routerLink="/users/profile" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'Perfil' | translate }}</a>
+                                </li>
+                                <!-- <li>
+                                    <a routerLink="/users/user-account-settings" routerLinkActive="active" (click)="toggleMobileMenu()"
+                                        >{{ 'Configurações' | translate }}</a
+                                    >
+                                </li> -->
+                            </ul>
+                        </div>
+                    </li>
+                </ul>
+            </ng-scrollbar>
+        </div>
+    </nav>
+</div>

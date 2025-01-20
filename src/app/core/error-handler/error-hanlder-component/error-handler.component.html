@@ -1,0 +1,9 @@
+<p-dialog header="Error" [(visible)]="displayErrorModal" [modal]="true" [style]="{ width: '35vw' }" [draggable]="false" [resizable]="false">
+    <ng-template pTemplate="header">
+        <h1 class="text-head">Atenção</h1>
+    </ng-template>
+
+    <ng-template pTemplate="content">
+        <p>{{ message }}</p>
+    </ng-template>
+</p-dialog>

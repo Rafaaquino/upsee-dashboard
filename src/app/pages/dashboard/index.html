@@ -1,0 +1,264 @@
+<div>
+    <ul class="flex space-x-2 rtl:space-x-reverse">
+        <li>
+            <a href="javascript:;" class="text-primary hover:underline">Dashboard</a>
+        </li>
+        <li class="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
+            <span>Pessoas</span>
+        </li>
+    </ul>
+
+    <div class="pt-5">
+        <div class="xl:grid-colssss-1 mb-6 grid gap-6 sm:grid-cols-2">
+            <div class="flex flex-row flex-wrap items-center justify-start">
+                <form [formGroup]="filterForm" class="filter-form">
+                    <div class="filter-group mb-3">
+                        <label for="dateFilter">Filtro:</label>
+                        <select id="dateFilter" class="form-select pr-10 text-white-dark" formControlName="dateFilter">
+                            <option value="today">HOJE</option>
+                            <option value="month">MÊS</option>
+                            <option value="year">ANO</option>
+                            <option value="range">DATA</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <div *ngIf="filterForm.get('dateFilter')?.value === 'range'" class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <div class="">
+                                <label for="startDate">Início:</label>
+                                <input id="startDate" class="form-input" type="date" formControlName="startDate" />
+                                <!-- <ng2-flatpickr [config]="basic" formControlName="startDate" addClass="form-input"></ng2-flatpickr> -->
+                            </div>
+
+                            <div class="">
+                                <label for="endDate">Fim:</label>
+                                <input id="endDate" class="form-input" type="date" formControlName="endDate" />
+                                <!-- <ng2-flatpickr [config]="basic" formControlName="endDate" addClass="form-input"></ng2-flatpickr> -->
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="mb-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div class="panel h-full">
+                <div class="mb-5 flex items-center justify-between dark:text-white-light">
+                    <h5 class="text-lg font-semibold">Tempo médio de permanência:</h5>
+                </div>
+                <div class="my-10 text-5xl font-bold text-[#e95f2b]">
+                    <span class="ltr:mr-2 rtl:ml-2">{{ averageStayTime }}</span>
+                </div>
+            </div>
+
+            <div class="panel h-full">
+                <!-- statistics -->
+                <div class="mb-5 flex items-center justify-between dark:text-white-light">
+                    <h5 class="text-lg font-semibold">Tempo médio de permanência por gênero:</h5>
+                </div>
+                <div class="grid gap-8 text-sm font-bold text-[#515365] sm:grid-cols-2">
+                    <div>
+                        <div>
+                            <div>Total Homem</div>
+                            <div class="text-3xl text-[#e95f2b]">{{ genderFormatTime.male}}</div>
+                        </div>
+                        <div class="overflow-hidden"></div>
+                    </div>
+
+                    <div>
+                        <div>
+                            <div>Total Mulher</div>
+                            <div class="text-3xl text-[#e95f2b]">{{ genderFormatTime.female}}</div>
+                        </div>
+                        <div class="overflow-hidden"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel overflow-hidden">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div class="text-lg font-bold">Frequência por Faixa Horária:</div>
+                        <div class="text-success">Quantidade de pessoas frequentando entre os horários:</div>
+                    </div>
+                </div>
+                <div class="relative mt-10">
+                    <div class="absolute -bottom-12 h-24 w-24 ltr:-right-12 rtl:-left-12">
+                        <icon-circle-check class="h-full w-full text-success opacity-20" />
+                    </div>
+                    <div class="grid grid-cols-2 gap-6 md:grid-cols-4">
+                        <div>
+                            <div class="text-xs text-primary">06:00 - 11:59</div>
+                            <div class="mt-2 text-2xl font-semibold">{{frequencyByTimeRange.morning}}</div>
+                        </div>
+                        <div>
+                            <div class="text-xs text-primary">12:00 - 17:59</div>
+                            <div class="mt-2 text-2xl font-semibold">{{frequencyByTimeRange.afternoon}}</div>
+                        </div>
+                        <div>
+                            <div class="text-xs text-primary">18:00 - 23:59</div>
+                            <div class="mt-2 text-2xl font-semibold">{{frequencyByTimeRange.evening}}</div>
+                        </div>
+                        <div>
+                            <div class="text-xs text-primary">00:00 - 05:59</div>
+                            <div class="mt-2 text-2xl font-semibold">{{frequencyByTimeRange.night}}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mb-6 grid gap-6 xl:grid-cols-3">
+            <div class="panel h-full xl:col-span-2">
+                <div class="mb-5 flex items-center justify-between dark:text-white-light">
+                    <h5 class="text-lg font-semibold">GÊNERO</h5>
+                </div>
+                <p class="text-lg dark:text-white-light/90">Taxa de acerto<span class="ml-2 text-primary">{{ totalScore.genderScore | percent}}%</span></p>
+                <div class="relative overflow-hidden">
+                    <!-- [dropShadow]="revenueChart.dropShadow" -->
+                    <apx-chart
+                        [series]="uniqueVisitor.series"
+                        [chart]="uniqueVisitor.chart"
+                        [dataLabels]="uniqueVisitor.dataLabels"
+                        [stroke]="uniqueVisitor.stroke"
+                        [colors]="uniqueVisitor.colors"
+                        [plotOptions]="uniqueVisitor.plotOptions"
+                        [legend]="uniqueVisitor.legend"
+                        [grid]="uniqueVisitor.grid"
+                        [xaxis]="uniqueVisitor.xaxis"
+                        [yaxis]="uniqueVisitor.yaxis"
+                        [fill]="uniqueVisitor.fill"
+                        [tooltip]="uniqueVisitor.tooltip"
+                        class="rounded-lg bg-white dark:bg-black"
+                    >
+                        <!-- loader -->
+                        <div class="grid min-h-[325px] place-content-center bg-white-light/30 dark:bg-dark dark:bg-opacity-[0.08]">
+                            <span class="inline-flex h-5 w-5 animate-spin rounded-full border-2 border-black !border-l-transparent dark:border-white"></span>
+                        </div>
+                    </apx-chart>
+                </div>
+            </div>
+
+            <div class="panel h-full">
+                <div class="mb-5 flex items-center">
+                    <h5 class="text-lg font-semibold dark:text-white-light">Total de pessoas</h5>
+                </div>
+                <div class="overflow-hidden">
+                    <apx-chart
+                        [series]="salesByCategory.series"
+                        [chart]="salesByCategory.chart"
+                        [dataLabels]="salesByCategory.dataLabels"
+                        [stroke]="salesByCategory.stroke"
+                        [colors]="salesByCategory.colors"
+                        [legend]="salesByCategory.legend"
+                        [plotOptions]="salesByCategory.plotOptions"
+                        [labels]="salesByCategory.labels"
+                        [states]="salesByCategory.states"
+                        class="rounded-lg bg-white dark:bg-black"
+                    >
+                        <!-- loader -->
+                        <div class="grid min-h-[460px] place-content-center bg-white-light/30 dark:bg-dark dark:bg-opacity-[0.08]">
+                            <span class="inline-flex h-5 w-5 animate-spin rounded-full border-2 border-black !border-l-transparent dark:border-white"></span>
+                        </div>
+                    </apx-chart>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-6 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+            <div class="panel h-full xl:col-span-2">
+                <div class="mb-5 flex items-center">
+                    <h5 class="text-lg font-semibold dark:text-white-light">Frequência de Pessoas por Faixa Horária</h5>
+
+                    <div class="flex w-full items-center justify-between p-5">
+                        <div class="relative">
+                            <div class="flex h-11 w-11 items-center justify-center"></div>
+                        </div>
+                        <h5 class="bg-grey-chart text-2xl font-semibold dark:text-white-light ltr:text-right rtl:text-left">
+                            {{ totalPeople}}
+                            <span class="block text-sm font-normal">Total Pessoas</span>
+                        </h5>
+                    </div>
+                </div>
+                <div class="overflow-hidden">
+                    <apx-chart
+                        [series]="lineTimeHours.series"
+                        [chart]="lineTimeHours.chart"
+                        [xaxis]="lineTimeHours.xaxis"
+                        [stroke]="lineTimeHours.stroke"
+                        [fill]="lineTimeHours.fill"
+                        [dataLabels]="lineTimeHours.dataLabels"
+                    >
+                        loader
+                        <div class="grid min-h-[175px] place-content-center bg-white-light/30 dark:bg-dark dark:bg-opacity-[0.08]">
+                            <span class="inline-flex h-5 w-5 animate-spin rounded-full border-2 border-black !border-l-transparent dark:border-white"></span>
+                        </div>
+                    </apx-chart>
+                </div>
+            </div>
+
+            <div class="panel h-full">
+                <div class="mb-5 flex items-center">
+                    <h5 class="text-lg font-semibold dark:text-white-light">Taxa de acerto de pessoa em %</h5>
+                </div>
+                <div class="overflow-hidden">
+                    <apx-chart
+                        [series]="hitRate.series"
+                        [chart]="hitRate.chart"
+                        [plotOptions]="hitRate.plotOptions"
+                        [labels]="hitRate.labels"
+                        [stroke]="hitRate.stroke"
+                        [fill]="hitRate.fill"
+                        class="rounded-lg bg-white dark:bg-black"
+                    >
+                    </apx-chart>
+                </div>
+            </div>
+
+            <div class="panel h-full sm:col-span-2 xl:col-span-1">
+                <div class="mb-5 flex items-center">
+                    <h5 class="text-lg font-semibold dark:text-white-light">Frequência de Acessos por Dia da Semana</h5>
+                </div>
+                <div class="overflow-hidden">
+                    <apx-chart
+                        [series]="frequencyByWeekday.series"
+                        [chart]="frequencyByWeekday.chart"
+                        [xaxis]="frequencyByWeekday.xaxis"
+                        [yaxis]="frequencyByWeekday.yaxis"
+                        [dataLabels]="frequencyByWeekday.dataLabels"
+                        [plotOptions]="frequencyByWeekday.plotOptions"
+                        [fill]="frequencyByWeekday.fill"
+                        class="rounded-lg bg-white dark:bg-black"
+                    >
+                        loader
+                        <div class="grid min-h-[175px] place-content-center bg-white-light/30 dark:bg-dark dark:bg-opacity-[0.08]">
+                            <span class="inline-flex h-5 w-5 animate-spin rounded-full border-2 border-black !border-l-transparent dark:border-white"></span>
+                        </div>
+                    </apx-chart>
+                </div>
+            </div>
+
+            <div class="panel h-full sm:col-span-2 xl:col-span-1">
+                <div class="mb-5 flex items-center">
+                    <h5 class="text-lg font-semibold dark:text-white-light">Proporção de Gênero por Faixa Horária</h5>
+                </div>
+                <div class="overflow-hidden">
+                    <apx-chart
+                        [series]="genderProportionByPeriod.series"
+                        [chart]="genderProportionByPeriod.chart"
+                        [xaxis]="genderProportionByPeriod.xaxis"
+                        [yaxis]="genderProportionByPeriod.yaxis"
+                        [plotOptions]="genderProportionByPeriod.plotOptions"
+                        [dataLabels]="genderProportionByPeriod.dataLabels"
+                        [colors]="genderProportionByPeriod.colors"
+                        [legend]="genderProportionByPeriod.legend"
+                        class="rounded-lg bg-white dark:bg-black"
+                    >
+                        loader
+                        <div class="grid min-h-[175px] place-content-center bg-white-light/30 dark:bg-dark dark:bg-opacity-[0.08]">
+                            <span class="inline-flex h-5 w-5 animate-spin rounded-full border-2 border-black !border-l-transparent dark:border-white"></span>
+                        </div>
+                    </apx-chart>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
