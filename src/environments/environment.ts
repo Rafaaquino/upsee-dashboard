@@ -3,7 +3,7 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-    production: false,
+    production: true,
     host_api: 'https://upsee-backend-api-f8acb7e029cc.herokuapp.com',
     host_auth: '/auth',
     host_user: '/user',
