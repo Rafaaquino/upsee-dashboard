@@ -44,14 +44,16 @@ export class ProfileComponent implements OnInit {
         console.log(this.user);
     }
 
-    ngOnInit() {}
+    ngOnInit() {
+        this.formUser.patchValue(this.user);
+    }
 
     onSubmit() {
         debugger;
         if (this.formUser.valid) {
             this._userService.updateUser(this.formUser.value, this.user.id).subscribe(
-                (user) => {
-                    this._userService.setUser(user);
+                (user: any) => {
+                    this._userService.setUser(user.updatedUser);
                     this.formUser.disable();
                 },
                 (error) => {

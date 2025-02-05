@@ -8,7 +8,8 @@
     "scripts": {
         "ng": "ng",
         "start": "node server --configuration=production",
-        "build": "ng build",
+        "start:dev": "ng serve --open --port 4201",
+        "build": "ng build --configuration=production",
         "watch": "ng build --watch --configuration development",
         "test": "ng test",
         "heroku-postbuild": "ng build --configuration=production",
