@@ -4,6 +4,11 @@ import { Injectable } from '@angular/core';
     providedIn: 'root',
 })
 export class MockDataService {
+    getFormattedDay() {
+        const today = new Date().getDate();
+        return today < 10 ? `0${today}` : `${today}`;
+    }
+
     generateMockData(): any[] {
         const baseData = {
             stop_detection_time: '24/12/24 15:43:31',
@@ -22,7 +27,7 @@ export class MockDataService {
 
         // Função para gerar a data no formato DD/MM/YY HH:mm:ss
         const generateDate = (month: number): string => {
-            const today = new Date().getDate();
+            const today = this.getFormattedDay();
             const day = String(Math.floor(Math.random() * 28) + 1).padStart(2, '0'); // Garante um valor de dia entre 01 e 28
             const hour = String(Math.floor(Math.random() * 24)).padStart(2, '0'); // Hora entre 00 e 23
             const minute = String(Math.floor(Math.random() * 60)).padStart(2, '0'); // Minuto entre 00 e 59

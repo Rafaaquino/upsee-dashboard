@@ -9,6 +9,8 @@ import { firstValueFrom } from 'rxjs';
 import { MockDataService } from './service/MockData.service';
 import { IData, IFrequencyByTimeRange, IGender, IGenderFormatTime, IScoreTotal } from './models/data.interface';
 import { FlatpickrOptions } from 'ng2-flatpickr';
+import { IUser } from '../users/models/user.interface';
+import { UserService } from '../users/services/user.service';
 
 @Component({
     moduleId: module.id,
@@ -21,6 +23,7 @@ import { FlatpickrOptions } from 'ng2-flatpickr';
     ],
 })
 export class IndexComponent implements OnInit {
+    user: IUser;
     store: any;
     revenueChart: any;
     salesByCategory: any;
@@ -40,7 +43,7 @@ export class IndexComponent implements OnInit {
     totalScore: IScoreTotal = { genderScore: 0, personScore: 0 };
     genderFormatTime: IGenderFormatTime = { male: '00:00:00', female: '00:00:00' };
     frequencyByTimeRange: IFrequencyByTimeRange = { morning: 0, afternoon: 0, evening: 0, night: 0 };
-    params: IParamsData = { cliente_id: '21122024', from: '21/12/24', to: '21/12/24' };
+    params: IParamsData;
     basic: FlatpickrOptions;
     basicEnd: FlatpickrOptions;
 
@@ -49,7 +52,8 @@ export class IndexComponent implements OnInit {
         private fb: FormBuilder,
         private _dataService: DataService,
         private _filterService: FilterService,
-        private _mockDataService: MockDataService
+        private _mockDataService: MockDataService,
+        private _userService: UserService
     ) {
         this.initStore();
         this.isLoading = false;
@@ -70,7 +74,9 @@ export class IndexComponent implements OnInit {
             dateFormat: 'DD/MM/YY HH:mm:ss',
             position: this.store.rtlClass === 'rtl' ? 'auto right' : 'auto left',
         };
-
+        this.user = this._userService.getUser();
+        console.log('user: ', this.user);
+        this.params = { cliente_id: this.user.client_id.toString(), from: this.filterForm.get('startDate')?.value, to: this.filterForm.get('endDate')?.value };
         this.initializeData(); // Usamos uma função separada para garantir a inicialização síncrona
     }
 
@@ -81,7 +87,13 @@ export class IndexComponent implements OnInit {
     }
 
     private async initializeData() {
-        this.fetchData = await this._mockDataService.generateMockData();
+        if (this.user.client_id == 1737398034882340) {
+            this.fetchData = await this._mockDataService.generateMockData();
+        } else {
+            await this._dataService.getData(this.params).subscribe((res) => {
+                this.fetchData = res;
+            });
+        }
 
         console.log('início', this.fetchData);
         this.updateChart();
@@ -571,85 +583,6 @@ export class IndexComponent implements OnInit {
             series: [985, 737, 270],
         };
 
-        // daily sales
-        // this.dailySales = {
-        //     chart: {
-        //         height: 160,
-        //         type: 'bar',
-        //         fontFamily: 'Nunito, sans-serif',
-        //         toolbar: {
-        //             show: false,
-        //         },
-        //         stacked: true,
-        //         stackType: '100%',
-        //     },
-        //     dataLabels: {
-        //         enabled: false,
-        //     },
-        //     stroke: {
-        //         show: true,
-        //         width: 1,
-        //     },
-        //     colors: ['#e2a03f', '#e0e6ed'],
-        //     responsive: [
-        //         {
-        //             breakpoint: 480,
-        //             options: {
-        //                 legend: {
-        //                     position: 'bottom',
-        //                     offsetX: -10,
-        //                     offsetY: 0,
-        //                 },
-        //             },
-        //         },
-        //     ],
-        //     xaxis: {
-        //         labels: {
-        //             show: false,
-        //         },
-        //         categories: ['Sun', 'Mon', 'Tue', 'Wed', 'Thur', 'Fri', 'Sat'],
-        //     },
-        //     yaxis: {
-        //         show: false,
-        //     },
-        //     fill: {
-        //         opacity: 1,
-        //     },
-        //     plotOptions: {
-        //         bar: {
-        //             horizontal: false,
-        //             columnWidth: '25%',
-        //         },
-        //     },
-        //     legend: {
-        //         show: false,
-        //     },
-        //     grid: {
-        //         show: false,
-        //         xaxis: {
-        //             lines: {
-        //                 show: false,
-        //             },
-        //         },
-        //         padding: {
-        //             top: 10,
-        //             right: -20,
-        //             bottom: -20,
-        //             left: -20,
-        //         },
-        //     },
-        //     series: [
-        //         {
-        //             name: 'Sales',
-        //             data: [44, 55, 41, 67, 22, 43, 21],
-        //         },
-        //         {
-        //             name: 'Last Week',
-        //             data: [13, 23, 20, 8, 13, 27, 33],
-        //         },
-        //     ],
-        // };
-
         // total orders
         this.totalOrders = {
             chart: {
@@ -794,7 +727,18 @@ export class IndexComponent implements OnInit {
     }
 
     updateChart(): void {
-        debugger;
+        //debugger;
+        this.params = {
+            cliente_id: this.params?.cliente_id || '', // Mantém o cliente_id se já existir
+            detected_date: this.params?.detected_date, // Mantém detected_date se necessário
+            from: this.formatDateToShort(this.filterForm.get('startDate')?.value),
+            to: this.formatDateToShort(this.filterForm.get('endDate')?.value),
+        };
+
+        this._dataService.getData(this.params).subscribe((res) => {
+            this.fetchData = res;
+        });
+
         const filteredData = this._filterService.filterData(this.fetchData, this.filterForm.value);
 
         const genderCountByMonth = this._filterService.countGenderByMonth(filteredData);
@@ -913,5 +857,16 @@ export class IndexComponent implements OnInit {
                 },
             },
         };
+    }
+
+    formatDateToShort(date: string | Date): string {
+        const d = new Date(date);
+        if (isNaN(d.getTime())) return ''; // Retorna string vazia se a data for inválida
+
+        const day = d.getDate().toString().padStart(2, '0');
+        const month = (d.getMonth() + 1).toString().padStart(2, '0');
+        const year = d.getFullYear().toString().slice(-2); // Pega os últimos dois dígitos do ano
+
+        return `${day}/${month}/${year}`;
     }
 }

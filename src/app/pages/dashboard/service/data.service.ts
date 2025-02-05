@@ -14,6 +14,6 @@ export class DataService {
     getData(paramsdata: IParamsData): Observable<any> {
         const params = new HttpParams().set('client_id', paramsdata.cliente_id).set('from', paramsdata.from).set('to', paramsdata.to);
 
-        return this.http.get<IData[]>(environment.host_api + `/data`, { params });
+        return this.http.get<IData[]>(environment.host_api + environment.api_verions + environment.host_data, { params });
     }
 }
