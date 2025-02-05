@@ -728,16 +728,18 @@ export class IndexComponent implements OnInit {
 
     updateChart(): void {
         //debugger;
-        this.params = {
-            cliente_id: this.params?.cliente_id || '', // Mantém o cliente_id se já existir
-            detected_date: this.params?.detected_date, // Mantém detected_date se necessário
-            from: this.formatDateToShort(this.filterForm.get('startDate')?.value),
-            to: this.formatDateToShort(this.filterForm.get('endDate')?.value),
-        };
+        if (this.user.client_id != 1737398034882340) {
+            this.params = {
+                cliente_id: this.params?.cliente_id || '', // Mantém o cliente_id se já existir
+                detected_date: this.params?.detected_date, // Mantém detected_date se necessário
+                from: this.formatDateToShort(this.filterForm.get('startDate')?.value),
+                to: this.formatDateToShort(this.filterForm.get('endDate')?.value),
+            };
 
-        this._dataService.getData(this.params).subscribe((res) => {
-            this.fetchData = res;
-        });
+            this._dataService.getData(this.params).subscribe((res) => {
+                this.fetchData = res;
+            });
+        }
 
         const filteredData = this._filterService.filterData(this.fetchData, this.filterForm.value);
 
