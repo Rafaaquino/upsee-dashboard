@@ -38,7 +38,13 @@
                             "angular2-text-mask",
                             "quill",
                             "ng2-flatpickr"
-                        ]
+                        ],
+                        "buildOptimizer": false,
+                        "optimization": false,
+                        "vendorChunk": true,
+                        "extractLicenses": false,
+                        "sourceMap": true,
+                        "namedChunks": true
                     },
                     "configurations": {
                         "production": {

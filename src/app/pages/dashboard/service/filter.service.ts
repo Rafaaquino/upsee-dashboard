@@ -15,7 +15,8 @@ import isBetween from 'dayjs/plugin/isBetween';
 // Registrar o plugin
 dayjs.extend(isBetween);
 import customParseFormat from 'dayjs/plugin/customParseFormat';
-import { co } from '@fullcalendar/core/internal-common';
+import { IParamsData } from '../models/params-data.interface';
+import { IUser } from '../../users/models/user.interface';
 
 dayjs.extend(customParseFormat);
 
@@ -92,26 +93,89 @@ export class FilterService {
         });
     }
 
-    filterGenderCounts(data: IData[]): { series: number[] } {
-        const counts = {
-            total: 0,
-            male: 0,
-            female: 0,
+    initializeParamsData(filterForm: string, user: IUser, formValues?: any): IParamsData {
+        const formatDate = (date: Date): string => {
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = String(date.getFullYear()).slice(-2);
+            return `${day}/${month}/${year}`;
         };
 
-        data.forEach((item) => {
-            if (item.gender === 'masculino') {
-                counts.male += 1;
-            } else if (item.gender === 'feminino') {
-                counts.female += 1;
-            }
-        });
+        const today = new Date();
+        let fromDate: Date;
+        let toDate: Date;
 
-        counts.total = counts.male + counts.female;
+        switch (filterForm) {
+            case 'today':
+                fromDate = today;
+                toDate = today;
+                break;
+
+            case 'month':
+                fromDate = new Date(today.getFullYear(), today.getMonth(), 1);
+                toDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+                break;
+
+            case 'year':
+                fromDate = new Date(today.getFullYear(), 0, 1);
+                toDate = today;
+                break;
+
+            case 'range':
+                if (formValues?.startDate && formValues?.endDate) {
+                    const startDate = dayjs(formValues.startDate).toDate();
+                    const endDate = dayjs(formValues.endDate).toDate();
+
+                    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+                        fromDate = today;
+                        toDate = today;
+                    } else {
+                        fromDate = startDate;
+                        toDate = endDate;
+                    }
+                } else {
+                    return {
+                        cliente_id: user.client_id.toString(),
+                        from: '',
+                        to: '',
+                    };
+                }
+                break;
+
+            default:
+                fromDate = today;
+                toDate = today;
+        }
+
+        // Validação adicional para garantir datas válidas
+        if (!fromDate || isNaN(fromDate.getTime())) {
+            fromDate = today;
+        }
+        if (!toDate || isNaN(toDate.getTime())) {
+            toDate = today;
+        }
 
         return {
-            series: [counts.male, counts.female],
+            cliente_id: user.client_id.toString(),
+            from: formatDate(fromDate),
+            to: formatDate(toDate),
         };
+    }
+
+    filterGenderCounts(data: IData[]): { male: number; female: number } {
+        const counts = data.reduce(
+            (acc, curr) => {
+                if (curr.gender === 'male') {
+                    acc.male++;
+                } else if (curr.gender === 'female') {
+                    acc.female++;
+                }
+                return acc;
+            },
+            { male: 0, female: 0 }
+        );
+
+        return counts;
     }
 
     countGenderByMonth(data: IData[]): Array<{ month: string; male: number; female: number }> {
