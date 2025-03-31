@@ -1,26 +1,27 @@
 import jsPDF from 'jspdf';
+import { IGender, IFrequencyByTimeRange, IGenderFormatTime } from './data.interface';
 
 export interface IExportSummary {
     totalPeople: number;
-    genderDistribution: {
-        male: number;
-        female: number;
-    };
-    averageStayTime: string;
-    genderStayTime: {
-        male: string;
-        female: string;
-    };
     hitRate: number;
-    timeRangeDistribution: {
-        morning: number;
-        afternoon: number;
-        evening: number;
-        night: number;
+    averageStayTime: string;
+    genderCount: IGender;
+    genderFormatTime: IGenderFormatTime;
+    frequencyByTimeRange: IFrequencyByTimeRange;
+    frequencyByWeekday: {
+        sunday: number;
+        monday: number;
+        tuesday: number;
+        wednesday: number;
+        thursday: number;
+        friday: number;
+        saturday: number;
     };
-    weekdayDistribution: {
-        counts: number[];
-        days: string[];
+    genderProportionByPeriod: {
+        morning: IGender;
+        afternoon: IGender;
+        evening: IGender;
+        night: IGender;
     };
 }
 

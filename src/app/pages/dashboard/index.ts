@@ -52,6 +52,7 @@ export class IndexComponent implements OnInit {
     };
     basic: FlatpickrOptions;
     basicEnd: FlatpickrOptions;
+    showExportOptions = false;
 
     constructor(
         public storeData: Store<any>,
@@ -950,5 +951,56 @@ export class IndexComponent implements OnInit {
         const year = d.getFullYear().toString().slice(-2); // Pega os últimos dois dígitos do ano
 
         return `${day}/${month}/${year}`;
+    }
+
+    toggleExportOptions(): void {
+        this.showExportOptions = !this.showExportOptions;
+    }
+
+    prepareExportData(): IExportSummary {
+        const weekdayData = this._filterService.calculateFrequencyByWeekday(this.fetchData);
+        const genderProportionData = this._filterService.calculateGenderProportionByPeriod(this.fetchData);
+
+        return {
+            totalPeople: this.totalPeople || 0,
+            hitRate: this.totalScore?.personScore || 0,
+            averageStayTime: this.averageStayTime || '00:00:00',
+            genderCount: this._filterService.filterGenderCounts(this.fetchData) || { male: 0, female: 0 },
+            genderFormatTime: this.genderFormatTime || { male: '00:00:00', female: '00:00:00' },
+            frequencyByTimeRange: this.frequencyByTimeRange || { morning: 0, afternoon: 0, evening: 0, night: 0 },
+            frequencyByWeekday: {
+                sunday: weekdayData.counts[0] || 0,
+                monday: weekdayData.counts[1] || 0,
+                tuesday: weekdayData.counts[2] || 0,
+                wednesday: weekdayData.counts[3] || 0,
+                thursday: weekdayData.counts[4] || 0,
+                friday: weekdayData.counts[5] || 0,
+                saturday: weekdayData.counts[6] || 0,
+            },
+            genderProportionByPeriod: {
+                morning: { male: genderProportionData.male[0] || 0, female: genderProportionData.female[0] || 0 },
+                afternoon: { male: genderProportionData.male[1] || 0, female: genderProportionData.female[1] || 0 },
+                evening: { male: genderProportionData.male[2] || 0, female: genderProportionData.female[2] || 0 },
+                night: { male: genderProportionData.male[3] || 0, female: genderProportionData.female[3] || 0 },
+            },
+        };
+    }
+
+    exportToPDF(): void {
+        const exportData = this.prepareExportData();
+        this.exportService.exportData('pdf', this.fetchData, this.params, exportData);
+        this.showExportOptions = false;
+    }
+
+    exportToExcel(): void {
+        const exportData = this.prepareExportData();
+        this.exportService.exportData('excel', this.fetchData, this.params, exportData);
+        this.showExportOptions = false;
+    }
+
+    exportToCSV(): void {
+        const exportData = this.prepareExportData();
+        this.exportService.exportData('csv', this.fetchData, this.params, exportData);
+        this.showExportOptions = false;
     }
 }
