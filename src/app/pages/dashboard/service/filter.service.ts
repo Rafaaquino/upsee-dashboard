@@ -162,12 +162,12 @@ export class FilterService {
         };
     }
 
-    filterGenderCounts(data: IData[]): { male: number; female: number } {
+    filterGenderCounts(data: IData[]): { male: number; female: number; sales: number[] } {
         const counts = data.reduce(
             (acc, curr) => {
-                if (curr.gender === 'male') {
+                if (curr.gender === 'masculino') {
                     acc.male++;
-                } else if (curr.gender === 'female') {
+                } else if (curr.gender === 'feminino') {
                     acc.female++;
                 }
                 return acc;
@@ -175,7 +175,10 @@ export class FilterService {
             { male: 0, female: 0 }
         );
 
-        return counts;
+        return {
+            ...counts,
+            sales: [counts.male, counts.female],
+        };
     }
 
     countGenderByMonth(data: IData[]): Array<{ month: string; male: number; female: number }> {

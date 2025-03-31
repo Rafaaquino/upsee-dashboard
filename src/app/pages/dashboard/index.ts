@@ -645,7 +645,7 @@ export class IndexComponent implements OnInit {
                     },
                 },
             },
-            series: [985, 737, 270],
+            series: [0, 0, 0],
         };
 
         // total orders
@@ -881,7 +881,7 @@ export class IndexComponent implements OnInit {
 
         this.salesByCategory = {
             ...this.salesByCategory,
-            series: this._filterService.filterGenderCounts(filteredData) || [0, 0],
+            series: this._filterService.filterGenderCounts(filteredData).sales || [0, 0],
         };
 
         this.lineTimeHours = {
