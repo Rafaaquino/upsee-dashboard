@@ -5,12 +5,14 @@ import { DataService } from './service/data.service';
 import { FilterService } from './service/filter.service';
 import { IParamsData } from './models/params-data.interface';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { firstValueFrom } from 'rxjs';
+import { debounceTime, distinctUntilChanged, EMPTY, firstValueFrom, merge } from 'rxjs';
 import { MockDataService } from './service/MockData.service';
 import { IData, IFrequencyByTimeRange, IGender, IGenderFormatTime, IScoreTotal } from './models/data.interface';
 import { FlatpickrOptions } from 'ng2-flatpickr';
 import { IUser } from '../users/models/user.interface';
 import { UserService } from '../users/services/user.service';
+import { ExportService } from './service/export.service';
+import { IExportSummary } from './models/export.interface';
 
 @Component({
     moduleId: module.id,
@@ -43,9 +45,14 @@ export class IndexComponent implements OnInit {
     totalScore: IScoreTotal = { genderScore: 0, personScore: 0 };
     genderFormatTime: IGenderFormatTime = { male: '00:00:00', female: '00:00:00' };
     frequencyByTimeRange: IFrequencyByTimeRange = { morning: 0, afternoon: 0, evening: 0, night: 0 };
-    params: IParamsData;
+    params: IParamsData = {
+        cliente_id: '',
+        from: '',
+        to: '',
+    };
     basic: FlatpickrOptions;
     basicEnd: FlatpickrOptions;
+    showExportOptions = false;
 
     constructor(
         public storeData: Store<any>,
@@ -53,14 +60,16 @@ export class IndexComponent implements OnInit {
         private _dataService: DataService,
         private _filterService: FilterService,
         private _mockDataService: MockDataService,
-        private _userService: UserService
+        private _userService: UserService,
+        private exportService: ExportService
     ) {
         this.initStore();
         this.isLoading = false;
+
         this.filterForm = this.fb.group({
             dateFilter: ['today'], // Options: 'today', 'month', 'year', 'range'
-            startDate: [null],
-            endDate: [null],
+            startDate: [{ value: null, disabled: true }],
+            endDate: [{ value: null, disabled: true }],
         });
 
         this.basic = {
@@ -74,29 +83,60 @@ export class IndexComponent implements OnInit {
             dateFormat: 'DD/MM/YY HH:mm:ss',
             position: this.store.rtlClass === 'rtl' ? 'auto right' : 'auto left',
         };
+
         this.user = this._userService.getUser();
+
         console.log('user: ', this.user);
-        this.params = { cliente_id: this.user.client_id.toString(), from: this.filterForm.get('startDate')?.value, to: this.filterForm.get('endDate')?.value };
+
+        this.params = this._filterService.initializeParamsData(this.filterForm.get('dateFilter')?.value, this.user, this.filterForm.value);
+
+        // Observar mudanças no tipo de filtro
+        this.filterForm
+            .get('dateFilter')
+            ?.valueChanges.pipe(
+                distinctUntilChanged(), // Evita chamadas duplicadas com o mesmo valor
+                debounceTime(300) // Adiciona um pequeno delay para evitar múltiplas chamadas
+            )
+            .subscribe(this.handleFilterTypeChange.bind(this));
+
+        // Observar mudanças nas datas quando em modo range
+        merge(this.filterForm.get('startDate')?.valueChanges || EMPTY, this.filterForm.get('endDate')?.valueChanges || EMPTY)
+            .pipe(debounceTime(300), distinctUntilChanged())
+            .subscribe(() => {
+                if (this.filterForm.get('dateFilter')?.value === 'range') {
+                    this.handleRangeChange();
+                }
+            });
+
+        // Inicializa os dados
         this.initializeData(); // Usamos uma função separada para garantir a inicialização síncrona
     }
 
-    async ngOnInit() {
-        this.filterForm.valueChanges.subscribe(() => {
-            this.updateChart();
-        });
+    async ngOnInit() {}
+
+    private fetchDataFromApi(): void {
+        if (this.user.client_id != 1737398034882340) {
+            this._dataService.getData(this.params).subscribe({
+                next: (res) => {
+                    this.fetchData = res;
+                    this.updateChartData();
+                },
+                error: (error) => {
+                    console.error('Erro ao buscar dados:', error);
+                },
+            });
+        } else {
+            this.updateChartData();
+        }
     }
 
     private async initializeData() {
         if (this.user.client_id == 1737398034882340) {
             this.fetchData = await this._mockDataService.generateMockData();
+            this.updateChartData();
         } else {
-            await this._dataService.getData(this.params).subscribe((res) => {
-                this.fetchData = res;
-            });
+            this.fetchDataFromApi();
         }
-
-        console.log('início', this.fetchData);
-        this.updateChart();
     }
 
     private async getFetchData(): Promise<any> {
@@ -129,6 +169,31 @@ export class IndexComponent implements OnInit {
                     }
                 }
             });
+    }
+
+    private handleFilterTypeChange(value: string): void {
+        const startDateControl = this.filterForm.get('startDate');
+        const endDateControl = this.filterForm.get('endDate');
+
+        if (value === 'range') {
+            startDateControl?.enable();
+            endDateControl?.enable();
+        } else {
+            startDateControl?.disable();
+            endDateControl?.disable();
+            this.params = this._filterService.initializeParamsData(value, this.user, this.filterForm.value);
+            this.fetchDataFromApi();
+        }
+    }
+
+    private handleRangeChange(): void {
+        const startDate = this.filterForm.get('startDate')?.value;
+        const endDate = this.filterForm.get('endDate')?.value;
+
+        if (startDate && endDate) {
+            this.params = this._filterService.initializeParamsData('range', this.user, this.filterForm.value);
+            this.fetchDataFromApi();
+        }
     }
 
     initCharts() {
@@ -727,23 +792,39 @@ export class IndexComponent implements OnInit {
     }
 
     updateChart(): void {
-        //debugger;
         if (this.user.client_id != 1737398034882340) {
             this.params = {
-                cliente_id: this.params?.cliente_id || '', // Mantém o cliente_id se já existir
-                detected_date: this.params?.detected_date, // Mantém detected_date se necessário
+                cliente_id: this.params?.cliente_id || '',
+                detected_date: this.params?.detected_date,
                 from: this.formatDateToShort(this.filterForm.get('startDate')?.value),
                 to: this.formatDateToShort(this.filterForm.get('endDate')?.value),
             };
 
             this._dataService.getData(this.params).subscribe((res) => {
                 this.fetchData = res;
+                this.updateChartData();
             });
+        } else {
+            this.updateChartData();
         }
+    }
 
+    updateChartData(): void {
         const filteredData = this._filterService.filterData(this.fetchData, this.filterForm.value);
 
-        const genderCountByMonth = this._filterService.countGenderByMonth(filteredData);
+        const defaultChartData = {
+            genderCount: { male: 0, female: 0 },
+            hitRate: '0.0',
+            peopleData: { counts: [0], times: ['00:00'] },
+            weekdayData: { counts: [0, 0, 0, 0, 0, 0, 0], days: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'] },
+            proportionData: {
+                male: [0, 0, 0, 0],
+                female: [0, 0, 0, 0],
+                labels: ['Manhã', 'Tarde', 'Noite', 'Madrugada'],
+            },
+        };
+
+        const genderCountByMonth = this._filterService.countGenderByMonth(filteredData) || [];
         console.log('genderCountByMonth', genderCountByMonth);
         genderCountByMonth.map((monthData) => {
             this.totalPeople = monthData.male + monthData.female;
@@ -780,27 +861,27 @@ export class IndexComponent implements OnInit {
         this.uniqueVisitor = {
             ...this.uniqueVisitor,
             xaxis: {
-                categories: genderCountByMonth.map((monthData) => monthData.month),
+                categories: genderCountByMonth.length > 0 ? genderCountByMonth.map((monthData) => monthData.month) : ['Jan'],
                 axisBorder: {
                     show: true,
-                    color: isDark ? '#3b3f5c' : '#e0e6ed',
+                    color: this.store.theme === 'dark' ? '#3b3f5c' : '#e0e6ed',
                 },
             },
             series: [
                 {
                     name: 'Homem',
-                    data: genderCountByMonth.map((monthData) => monthData.male),
+                    data: genderCountByMonth.map((monthData) => monthData.male || 0),
                 },
                 {
                     name: 'Mulher',
-                    data: genderCountByMonth.map((monthData) => monthData.female),
+                    data: genderCountByMonth.map((monthData) => monthData.female || 0),
                 },
             ],
         };
 
         this.salesByCategory = {
             ...this.salesByCategory,
-            series: this._filterService.filterGenderCounts(filteredData).series,
+            series: this._filterService.filterGenderCounts(filteredData) || [0, 0],
         };
 
         this.lineTimeHours = {
@@ -808,11 +889,11 @@ export class IndexComponent implements OnInit {
             series: [
                 {
                     name: 'Pessoas',
-                    data: peopleData.counts,
+                    data: peopleData.counts || [0],
                 },
             ],
             xaxis: {
-                categories: peopleData.times,
+                categories: peopleData.times || ['00:00'],
                 title: {
                     text: 'Horários mais movimentados',
                 },
@@ -829,11 +910,11 @@ export class IndexComponent implements OnInit {
             series: [
                 {
                     name: 'Frequência',
-                    data: weekdayData.counts,
+                    data: weekdayData.counts || defaultChartData.weekdayData.counts, // Frequência por dia da semana
                 },
             ],
             xaxis: {
-                categories: weekdayData.days, // Dias da semana
+                categories: weekdayData.days || defaultChartData.weekdayData.days, // Dias da semana
                 title: {
                     text: 'Dia da Semana',
                 },
@@ -845,15 +926,15 @@ export class IndexComponent implements OnInit {
             series: [
                 {
                     name: 'Masculino',
-                    data: proportionData.male,
+                    data: proportionData.male || defaultChartData.proportionData.male,
                 },
                 {
                     name: 'Feminino',
-                    data: proportionData.female,
+                    data: proportionData.female || defaultChartData.proportionData.female,
                 },
             ],
             xaxis: {
-                categories: proportionData.labels, // Faixas horárias
+                categories: proportionData.labels || defaultChartData.proportionData.labels, // Faixas horárias
                 title: {
                     text: 'Período do Dia',
                 },
@@ -870,5 +951,56 @@ export class IndexComponent implements OnInit {
         const year = d.getFullYear().toString().slice(-2); // Pega os últimos dois dígitos do ano
 
         return `${day}/${month}/${year}`;
+    }
+
+    toggleExportOptions(): void {
+        this.showExportOptions = !this.showExportOptions;
+    }
+
+    prepareExportData(): IExportSummary {
+        const weekdayData = this._filterService.calculateFrequencyByWeekday(this.fetchData);
+        const genderProportionData = this._filterService.calculateGenderProportionByPeriod(this.fetchData);
+
+        return {
+            totalPeople: this.totalPeople || 0,
+            hitRate: this.totalScore?.personScore || 0,
+            averageStayTime: this.averageStayTime || '00:00:00',
+            genderCount: this._filterService.filterGenderCounts(this.fetchData) || { male: 0, female: 0 },
+            genderFormatTime: this.genderFormatTime || { male: '00:00:00', female: '00:00:00' },
+            frequencyByTimeRange: this.frequencyByTimeRange || { morning: 0, afternoon: 0, evening: 0, night: 0 },
+            frequencyByWeekday: {
+                sunday: weekdayData.counts[0] || 0,
+                monday: weekdayData.counts[1] || 0,
+                tuesday: weekdayData.counts[2] || 0,
+                wednesday: weekdayData.counts[3] || 0,
+                thursday: weekdayData.counts[4] || 0,
+                friday: weekdayData.counts[5] || 0,
+                saturday: weekdayData.counts[6] || 0,
+            },
+            genderProportionByPeriod: {
+                morning: { male: genderProportionData.male[0] || 0, female: genderProportionData.female[0] || 0 },
+                afternoon: { male: genderProportionData.male[1] || 0, female: genderProportionData.female[1] || 0 },
+                evening: { male: genderProportionData.male[2] || 0, female: genderProportionData.female[2] || 0 },
+                night: { male: genderProportionData.male[3] || 0, female: genderProportionData.female[3] || 0 },
+            },
+        };
+    }
+
+    exportToPDF(): void {
+        const exportData = this.prepareExportData();
+        this.exportService.exportData('pdf', this.fetchData, this.params, exportData);
+        this.showExportOptions = false;
+    }
+
+    exportToExcel(): void {
+        const exportData = this.prepareExportData();
+        this.exportService.exportData('excel', this.fetchData, this.params, exportData);
+        this.showExportOptions = false;
+    }
+
+    exportToCSV(): void {
+        const exportData = this.prepareExportData();
+        this.exportService.exportData('csv', this.fetchData, this.params, exportData);
+        this.showExportOptions = false;
     }
 }
