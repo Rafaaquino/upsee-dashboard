@@ -2,8 +2,8 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { IData } from '../models/data.interface';
-import { environment } from 'src/environments/environment.dev';
 import { IParamsData } from '../models/params-data.interface';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
     providedIn: 'root',
