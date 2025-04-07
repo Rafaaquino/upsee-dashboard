@@ -835,6 +835,7 @@ export class IndexComponent implements OnInit {
         this.totalScore = this._filterService.calculateGenderScoreAverage(filteredData);
         console.log('totalScore', this.totalScore);
         const hitRatePercent = this.totalScore?.personScore?.toFixed(1).toString();
+        this.totalScore.genderScore = Math.round(this.totalScore.genderScore);
 
         console.log('hitRatePercent', hitRatePercent);
 
