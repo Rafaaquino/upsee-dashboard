@@ -826,9 +826,24 @@ export class IndexComponent implements OnInit {
 
         const genderCountByMonth = this._filterService.countGenderByMonth(filteredData) || [];
         console.log('genderCountByMonth', genderCountByMonth);
-        genderCountByMonth.map((monthData) => {
-            this.totalPeople = monthData.male + monthData.female;
-        });
+
+        if (genderCountByMonth.length > 0) {
+            // Tenta somar por gênero primeiro
+            let totalByGender = 0;
+            genderCountByMonth.forEach((monthData) => {
+                totalByGender += (monthData.male || 0) + (monthData.female || 0);
+            });
+
+            if (totalByGender > 0) {
+                this.totalPeople = totalByGender;
+            } else {
+                // Se não houver contagem por gênero, usa o total
+                this.totalPeople = genderCountByMonth.reduce((acc, monthData) => acc + (monthData.total || 0), 0);
+            }
+        } else {
+            // Se não houver dados por mês, usa o length do filteredData
+            this.totalPeople = filteredData.length;
+        }
 
         console.log('totalPeople', this.totalPeople);
 

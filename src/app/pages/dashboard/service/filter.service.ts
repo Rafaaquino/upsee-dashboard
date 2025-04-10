@@ -163,35 +163,71 @@ export class FilterService {
     }
 
     filterGenderCounts(data: IData[]): { male: number; female: number; sales: number[] } {
+        // Se não houver dados, retorna zeros
+        if (!data || data.length === 0) {
+            return {
+                male: 0,
+                female: 0,
+                sales: [0, 0],
+            };
+        }
+
+        // Primeiro, conta apenas os registros com gênero definido
         const counts = data.reduce(
             (acc, curr) => {
                 if (curr.gender === 'masculino') {
                     acc.male++;
                 } else if (curr.gender === 'feminino') {
                     acc.female++;
+                } else {
+                    acc.undefined++;
                 }
                 return acc;
             },
-            { male: 0, female: 0 }
+            { male: 0, female: 0, undefined: 0 }
         );
 
+        const totalDefinedGender = counts.male + counts.female;
+        const totalPeople = data.length;
+        const undefinedPeople = totalPeople - totalDefinedGender;
+
+        // Se houver pessoas sem gênero definido, distribui proporcionalmente
+        if (undefinedPeople > 0) {
+            if (totalDefinedGender === 0) {
+                // Se não houver nenhum gênero definido, divide igualmente
+                counts.male = Math.floor(totalPeople / 2);
+                counts.female = totalPeople - counts.male;
+            } else {
+                // Distribui proporcionalmente baseado nas proporções existentes
+                const maleRatio = counts.male / totalDefinedGender;
+                const undefinedMale = Math.round(undefinedPeople * maleRatio);
+                counts.male += undefinedMale;
+                counts.female += undefinedPeople - undefinedMale;
+            }
+        }
+
         return {
-            ...counts,
+            male: counts.male,
+            female: counts.female,
             sales: [counts.male, counts.female],
         };
     }
 
-    countGenderByMonth(data: IData[]): Array<{ month: string; male: number; female: number }> {
+    countGenderByMonth(data: IData[]): Array<{ month: string; male: number; female: number; total: number }> {
         const months = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
 
-        const genderCount: { [key: string]: { male: number; female: number } } = {};
+        if (!data || data.length === 0) {
+            return [];
+        }
+
+        const genderCount: { [key: string]: { male: number; female: number; total: number } } = {};
 
         data.forEach((item) => {
             const detectedTime = dayjs(item.detected_time, 'DD/MM/YY HH:mm:ss', true); // A data gerada deve estar no formato 'DD/MM/YY HH:mm:ss'
             const month = months[detectedTime.month()]; // Get month name
 
             if (!genderCount[month]) {
-                genderCount[month] = { male: 0, female: 0 };
+                genderCount[month] = { male: 0, female: 0, total: 0 };
             }
 
             if (item.gender === 'masculino') {
@@ -199,12 +235,15 @@ export class FilterService {
             } else if (item.gender === 'feminino') {
                 genderCount[month].female += 1;
             }
+
+            genderCount[month].total += 1;
         });
 
         return Object.keys(genderCount).map((month) => ({
             month,
             male: genderCount[month].male,
             female: genderCount[month].female,
+            total: genderCount[month].total,
         }));
     }
 
