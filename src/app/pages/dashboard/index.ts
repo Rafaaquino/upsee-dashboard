@@ -53,6 +53,7 @@ export class IndexComponent implements OnInit {
     basic: FlatpickrOptions;
     basicEnd: FlatpickrOptions;
     showExportOptions = false;
+    hitRatePercent: string = '0,00';
 
     constructor(
         public storeData: Store<any>,
@@ -118,7 +119,11 @@ export class IndexComponent implements OnInit {
         if (this.user.client_id != 1737398034882340) {
             this._dataService.getData(this.params).subscribe({
                 next: (res) => {
-                    this.fetchData = res;
+                    this.fetchData = res.map((item: any) => ({
+                        ...item,
+                        gender: (item.gender || '').toLowerCase(),
+                    }));
+                    console.log('Dados recebidos:', this.fetchData);
                     this.updateChartData();
                 },
                 error: (error) => {
@@ -849,10 +854,13 @@ export class IndexComponent implements OnInit {
 
         this.totalScore = this._filterService.calculateGenderScoreAverage(filteredData);
         console.log('totalScore', this.totalScore);
-        const hitRatePercent = this.totalScore?.personScore?.toFixed(1).toString();
-        this.totalScore.genderScore = Math.round(this.totalScore.genderScore);
 
-        console.log('hitRatePercent', hitRatePercent);
+        this.hitRatePercent = this.totalScore?.personScore !== undefined ? this.totalScore.personScore.toFixed(2).replace('.', ',') : '0,00';
+
+        const genderScorePercent = this.totalScore?.genderScore !== undefined ? this.totalScore.genderScore.toFixed(2).replace('.', ',') : '0,00';
+
+        console.log('hitRatePercent', this.hitRatePercent);
+        console.log('genderScorePercent', genderScorePercent);
 
         const isDark = this.store.theme === 'dark' || this.store.isDarkMode ? true : false;
         const isRtl = this.store.rtlClass === 'rtl' ? true : false;
@@ -918,7 +926,7 @@ export class IndexComponent implements OnInit {
 
         this.hitRate = {
             ...this.hitRate,
-            series: [hitRatePercent],
+            series: [this.hitRatePercent],
         };
 
         this.frequencyByWeekday = {
